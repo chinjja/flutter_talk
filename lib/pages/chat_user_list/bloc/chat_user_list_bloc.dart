@@ -31,21 +31,14 @@ class ChatUserListBloc extends Bloc<ChatUserListEvent, ChatUserListState> {
         users: data,
       ));
 
-      _subscription.add(
-        _chatRepository.onChatUserAdded(chat: event.chat).listen(
-          (event) {
-            add(ChatUserListAdded(event));
-          },
-        ),
-      );
-
-      _subscription.add(
-        _chatRepository.onChatUserRemoved(chat: event.chat).listen(
-          (event) {
-            add(ChatUserListRemoved(event));
-          },
-        ),
-      );
+      _subscription.add(_chatRepository.onChatUserChanged.listen((event) {
+        final chatUser = event.data;
+        if (event.isAdded) {
+          add(ChatUserAdded(chatUser));
+        } else if (event.isRemoved) {
+          add(ChatUserAdded(chatUser));
+        }
+      }));
     });
 
     on<ChatUserListFetched>((event, emit) async {
@@ -68,20 +61,19 @@ class ChatUserListBloc extends Bloc<ChatUserListEvent, ChatUserListState> {
       }
     });
 
-    on<ChatUserListAdded>((event, emit) {
-      emit(state.copyWith(users: [...state.users, ...event.users]));
+    on<ChatUserAdded>((event, emit) {
+      emit(state.copyWith(users: [...state.users, event.user]));
     });
 
-    on<ChatUserListRemoved>((event, emit) {
-      final set = event.users.map((e) => e.id).toSet();
+    on<ChatUserRemoved>((event, emit) {
       emit(state.copyWith(
-          users: state.users.where((e) => !set.contains(e.id)).toList()));
+          users: state.users.where((e) => e.id != event.user.id).toList()));
     });
   }
 
   @override
   Future<void> close() {
-    _subscription.cancel();
+    _subscription.dispose();
     return super.close();
   }
 }

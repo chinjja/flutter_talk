@@ -6,13 +6,11 @@ import 'package:talk/pages/login/login.dart';
 import 'package:talk/repos/repos.dart';
 
 class App extends StatelessWidget {
-  final TokenRepository tokenRepository;
   final AuthRepository authRepository;
   final ChatRepository chatRepository;
 
   const App({
     Key? key,
-    required this.tokenRepository,
     required this.authRepository,
     required this.chatRepository,
   }) : super(key: key);
@@ -21,9 +19,6 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
-        RepositoryProvider.value(
-          value: tokenRepository,
-        ),
         RepositoryProvider.value(
           value: authRepository,
         ),

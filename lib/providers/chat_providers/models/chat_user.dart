@@ -26,5 +26,5 @@ class ChatUser extends Equatable {
   Map<String, dynamic> toJson() => _$ChatUserToJson(this);
 
   @override
-  List<Object?> get props => [id, chat, user];
+  List<Object?> get props => [id, chat, user, readAt];
 }

@@ -14,7 +14,7 @@ class ChatListPage extends StatelessWidget {
     return BlocProvider(
       create: (context) => ChatListBloc(
         chatRepository: context.read<ChatRepository>(),
-      )..add(const ChatListInited()),
+      )..add(const ChatListStarted()),
       child: const ChatListView(),
     );
   }
@@ -60,12 +60,20 @@ class _ChatListView extends StatelessWidget {
             return ListView.builder(
               itemCount: chats.length,
               itemBuilder: (context, index) {
-                final chat = chats[index] as OpenChat;
+                final chatItem = chats[index];
+                final chat = chatItem.chat as OpenChat;
                 return ListTile(
                   leading: const CircleAvatar(child: Icon(Icons.chat)),
-                  title: Text(chat.title),
-                  subtitle: Text(chat.owner.username),
-                  trailing: const Chip(label: Text('1')),
+                  title: Text('${chat.title} ${chatItem.info.userCount}'),
+                  subtitle: chatItem.info.latestMessage == null
+                      ? null
+                      : Text(chatItem.info.latestMessage!.message),
+                  trailing: chatItem.info.unreadCount == 0
+                      ? null
+                      : Chip(
+                          label: Text('${chatItem.info.unreadCount}'),
+                          backgroundColor: Colors.deepOrange,
+                        ),
                   onTap: () {
                     Navigator.push(context, ChatPage.route(chat: chat));
                   },

@@ -27,6 +27,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           chat: event.chat,
           user: event.user,
         ));
+        await _chatRepository.read(chat: event.chat);
         final data =
             await _chatRepository.getMessages(chat: event.chat, limit: 50);
         emit(state.copyWith(
@@ -36,7 +37,11 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         ));
 
         _subscription.add(
-          _chatRepository.onChatMessageAdded(chat: event.chat).listen(
+          _chatRepository.onChatMessageChanged
+              .where((e) => e.isAdded)
+              .map((e) => e.data)
+              .where((e) => e.chat.id == event.chat.id)
+              .listen(
             (message) {
               add(ChatMessageReceived(message));
             },
@@ -77,7 +82,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       if (!state.hasNextMessage) return;
 
       final data = await _chatRepository.getMessages(
-          chat: chat, from: state.messages.last, limit: 50);
+          chat: chat, from: state.messages.last.instant, limit: 50);
       emit(state.copyWith(
         messages: [...state.messages, ...data],
         hasNextMessage: data.length == 50,
@@ -87,7 +92,11 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   @override
   Future<void> close() {
-    _subscription.cancel();
+    final chat = state.chat;
+    if (chat != null) {
+      _chatRepository.read(chat: chat);
+    }
+    _subscription.dispose();
     return super.close();
   }
 }

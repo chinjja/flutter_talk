@@ -7,8 +7,8 @@ abstract class ChatListEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class ChatListInited extends ChatListEvent {
-  const ChatListInited();
+class ChatListStarted extends ChatListEvent {
+  const ChatListStarted();
 }
 
 class ChatListFetched extends ChatListEvent {

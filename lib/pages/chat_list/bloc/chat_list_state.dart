@@ -10,7 +10,7 @@ enum ChatListStatus {
 @CopyWith()
 class ChatListState extends Equatable {
   final ChatListStatus status;
-  final List<Chat> chats;
+  final List<ChatItem> chats;
 
   const ChatListState({
     this.status = ChatListStatus.initial,

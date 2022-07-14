@@ -14,11 +14,11 @@ class ChatListBloc extends Bloc<ChatListEvent, ChatListState> {
     required ChatRepository chatRepository,
   })  : _chatRepository = chatRepository,
         super(const ChatListState()) {
-    on<ChatListInited>((event, emit) async {
+    on<ChatListStarted>((event, emit) async {
       emit(state.copyWith(status: ChatListStatus.loading));
       add(const ChatListFetched());
       await emit.forEach(_chatRepository.onJoinedChatsChanged,
-          onData: (List<Chat> data) {
+          onData: (List<ChatItem> data) {
         return state.copyWith(status: ChatListStatus.success, chats: data);
       });
     });

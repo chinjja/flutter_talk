@@ -1,31 +1,21 @@
-import 'package:dio/dio.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:rxdart/rxdart.dart';
-
-import '../models/models.dart';
-import 'repository.dart';
+import 'package:talk/providers/providers.dart';
 
 class AuthRepository {
   final _userChanged = BehaviorSubject<User?>.seeded(null);
-  final Dio _dio;
-  final TokenRepository _tokenRepository;
+  final AuthProvider _authProvider;
+  final TokenProvider _tokenProvider;
   User? user;
 
-  AuthRepository({
-    required Dio dio,
-    required TokenRepository tokenRepository,
-  })  : _dio = dio,
-        _tokenRepository = tokenRepository;
+  AuthRepository(this._authProvider, this._tokenProvider);
 
   Stream<User?> get onUserChanged => _userChanged;
 
   Future init() async {
-    final accessToken = await _tokenRepository.accessToken;
-    final refreshToken = await _tokenRepository.refreshToken;
-    if (accessToken != null &&
-        refreshToken != null &&
-        !JwtDecoder.isExpired(refreshToken)) {
-      final map = JwtDecoder.decode(accessToken);
+    final token = await _tokenProvider.read();
+    if (token != null && !JwtDecoder.isExpired(token.refreshToken)) {
+      final map = JwtDecoder.decode(token.accessToken);
       user = User(username: map['sub']);
       _userChanged.add(user);
     }
@@ -35,35 +25,24 @@ class AuthRepository {
     required String username,
     required String password,
   }) async {
-    await _dio.post(
-      '/auth/register',
-      data: {
-        'username': username,
-        'password': password,
-      },
-    );
+    await _authProvider.register(username: username, password: password);
   }
 
   Future<void> login({
     required String username,
     required String password,
   }) async {
-    final res = await _dio.post(
-      '/auth/login',
-      data: {
-        'username': username,
-        'password': password,
-      },
-    );
+    final token =
+        await _authProvider.login(username: username, password: password);
     user = User(username: username);
-    await _tokenRepository.setToken(Token.fromJson(res.data));
+    await _tokenProvider.write(token);
     _userChanged.add(user);
   }
 
   Future<void> logout() async {
-    await _dio.post('/auth/logout');
+    await _authProvider.logout();
     user = null;
-    await _tokenRepository.clearToken();
+    await _tokenProvider.clear();
     _userChanged.add(null);
   }
 }

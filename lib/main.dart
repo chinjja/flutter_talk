@@ -8,20 +8,31 @@ import 'app/app.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final tokenRepository = TokenRepository();
   final dio = Dio(BaseOptions(baseUrl: 'http://localhost:8080'));
+  final authProvider = AuthProvider(dio);
+  final tokenProvider = TokenProvider();
   final authRepository = AuthRepository(
-    dio: dio,
-    tokenRepository: tokenRepository,
+    authProvider,
+    tokenProvider,
   );
+
+  final chatProvider = ChatProvider(dio);
+  final chatUserProvider = ChatUserProvider(dio);
+  final chatMessageProvider = ChatMessageProvider(dio);
+  final chatListenProvider = ChatListenProvider(dio, chatProvider);
+  final friendProvider = FriendProvider(dio);
   final chatRepository = ChatRepository(
-    dio: dio,
-    authRepository: authRepository,
+    authRepository,
+    chatProvider,
+    chatUserProvider,
+    chatMessageProvider,
+    friendProvider,
+    chatListenProvider,
   );
   await authRepository.init();
 
   Future<bool> _refresh() async {
-    final token = await tokenRepository.token;
+    final token = await tokenProvider.read();
     if (token != null) {
       final refreshDio = Dio(BaseOptions(baseUrl: dio.options.baseUrl));
       try {
@@ -29,7 +40,8 @@ void main() async {
           '/auth/refresh',
           data: token.toJson(),
         );
-        await tokenRepository.setAccessToken(res.data['accessToken']);
+        await tokenProvider
+            .write(token.copyWith(accessToken: res.data['accessToken']));
         return true;
       } on DioError catch (e) {
         if (e.response?.statusCode == HttpStatus.unauthorized) {
@@ -42,9 +54,9 @@ void main() async {
 
   dio.interceptors.add(InterceptorsWrapper(
     onRequest: (options, handler) async {
-      final accessToken = await tokenRepository.accessToken;
-      if (accessToken != null) {
-        options.headers['Authorization'] = 'Bearer $accessToken';
+      final token = await tokenProvider.read();
+      if (token != null) {
+        options.headers['Authorization'] = 'Bearer ${token.accessToken}';
       }
       handler.next(options);
     },
@@ -68,7 +80,6 @@ void main() async {
   ));
   runApp(
     App(
-      tokenRepository: tokenRepository,
       authRepository: authRepository,
       chatRepository: chatRepository,
     ),

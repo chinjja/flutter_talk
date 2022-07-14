@@ -31,7 +31,6 @@ class FriendListBloc extends Bloc<FriendListEvent, FriendListState> {
 
     on<FriendAdded>((event, emit) async {
       emit(state.copyWith(addStatus: FriendListStatus.loading));
-      await Future.delayed(const Duration(seconds: 1));
       try {
         await _chatRepository.addFriend(username: event.username);
       } catch (_) {

@@ -19,22 +19,22 @@ class ChatUserListFetched extends ChatUserListEvent {
   const ChatUserListFetched();
 }
 
-class ChatUserListAdded extends ChatUserListEvent {
-  final List<ChatUser> users;
+class ChatUserAdded extends ChatUserListEvent {
+  final ChatUser user;
 
-  const ChatUserListAdded(this.users);
+  const ChatUserAdded(this.user);
 
   @override
-  List<Object> get props => [users];
+  List<Object> get props => [user];
 }
 
-class ChatUserListRemoved extends ChatUserListEvent {
-  final List<ChatUser> users;
+class ChatUserRemoved extends ChatUserListEvent {
+  final ChatUser user;
 
-  const ChatUserListRemoved(this.users);
+  const ChatUserRemoved(this.user);
 
   @override
-  List<Object> get props => [users];
+  List<Object> get props => [user];
 }
 
 class ChatUserListInvited extends ChatUserListEvent {
