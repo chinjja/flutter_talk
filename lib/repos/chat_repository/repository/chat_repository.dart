@@ -57,17 +57,17 @@ class ChatRepository {
           final message = event.data;
           final old = await _joinedChatsChanged.first;
           if (event.isAdded) {
-            _joinedChatsChanged.add([
-              ...old.map((e) {
-                if (e.chat.id != message.chat.id) return e;
-                return e.copyWith(
-                  info: e.info.copyWith(
-                    latestMessage: message,
-                    unreadCount: e.info.unreadCount + 1,
-                  ),
-                );
-              })
-            ]);
+            final list = old.map((e) {
+              if (e.chat.id != message.chat.id) return e;
+              return e.copyWith(
+                info: e.info.copyWith(
+                  latestMessage: message,
+                  unreadCount: e.info.unreadCount + 1,
+                ),
+              );
+            }).toList();
+            list.sort();
+            _joinedChatsChanged.add(list);
           }
         }));
         _subscriptions.add(onChatUserChanged.listen((event) async {
@@ -120,6 +120,7 @@ class ChatRepository {
     final list = await Stream.fromIterable(chats)
         .asyncMap((event) => bindChat(event))
         .toList();
+    list.sort();
     _joinedChatsChanged.add(list);
   }
 

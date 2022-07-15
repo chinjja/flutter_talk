@@ -1,13 +1,12 @@
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:equatable/equatable.dart';
-import 'package:talk/providers/chat_providers/dto/chat_info.dart';
 
 import '../../repos.dart';
 
 part 'chat_item.g.dart';
 
 @CopyWith()
-class ChatItem extends Equatable {
+class ChatItem extends Equatable implements Comparable<ChatItem> {
   final Chat chat;
   final ChatInfo info;
 
@@ -21,4 +20,11 @@ class ChatItem extends Equatable {
         chat,
         info,
       ];
+
+  @override
+  int compareTo(ChatItem other) {
+    final a = info.latestMessage?.instant ?? chat.createdAt;
+    final b = other.info.latestMessage?.instant ?? other.chat.createdAt;
+    return b.compareTo(a);
+  }
 }

@@ -5,10 +5,12 @@ import 'models.dart';
 abstract class Chat extends Equatable {
   final int id;
   final String dtype;
+  final DateTime createdAt;
 
   const Chat({
     required this.id,
     required this.dtype,
+    required this.createdAt,
   });
 
   bool get isOpenChat => dtype == "open";

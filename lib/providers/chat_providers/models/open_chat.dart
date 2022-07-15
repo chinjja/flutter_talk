@@ -11,15 +11,14 @@ class OpenChat extends Chat {
   final User owner;
   final String title;
   final String? description;
-  final DateTime createdAt;
 
   const OpenChat({
     required super.id,
     required super.dtype,
+    required super.createdAt,
     required this.owner,
     required this.title,
     this.description,
-    required this.createdAt,
   });
 
   factory OpenChat.fromJson(Map<String, dynamic> json) =>
