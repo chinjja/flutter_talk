@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:talk/pages/chat/chat.dart';
 import 'package:talk/pages/chat_create/chat_create.dart';
@@ -62,32 +63,56 @@ class _ChatListView extends StatelessWidget {
               itemExtent: 80,
               itemCount: chats.length,
               itemBuilder: (context, index) {
-                final chatItem = chats[index];
-                return ListTile(
-                  visualDensity: VisualDensity.standard,
-                  leading: const CircleAvatar(child: Icon(Icons.chat)),
-                  title: _Title(item: chatItem),
-                  subtitle:
-                      _Message(message: chatItem.info.latestMessage?.message),
-                  trailing: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      _Date(date: chatItem.info.latestMessage?.instant),
-                      _Badge(count: chatItem.info.unreadCount),
-                    ],
-                  ),
-                  onTap: () {
-                    Navigator.push(
-                        context, ChatPage.route(chat: chatItem.chat));
-                  },
-                );
+                return _ChatTile(chatItem: chats[index]);
               },
             );
           default:
             return const SizedBox();
         }
       },
+    );
+  }
+}
+
+class _ChatTile extends StatelessWidget {
+  final ChatItem chatItem;
+  const _ChatTile({Key? key, required this.chatItem}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Slidable(
+      endActionPane: ActionPane(
+        extentRatio: 0.2,
+        motion: const DrawerMotion(),
+        children: [
+          SlidableAction(
+            onPressed: (context) {
+              context.read<ChatListBloc>().add(ChatListLeaved(chatItem.chat));
+            },
+            backgroundColor: Colors.deepOrange,
+            foregroundColor: Colors.white,
+            icon: Icons.exit_to_app,
+            label: '나가기',
+          ),
+        ],
+      ),
+      child: ListTile(
+        visualDensity: VisualDensity.standard,
+        leading: const CircleAvatar(child: Icon(Icons.chat)),
+        title: _Title(item: chatItem),
+        subtitle: _Message(message: chatItem.info.latestMessage?.message),
+        trailing: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            _Date(date: chatItem.info.latestMessage?.instant),
+            _Badge(count: chatItem.info.unreadCount),
+          ],
+        ),
+        onTap: () {
+          Navigator.push(context, ChatPage.route(chat: chatItem.chat));
+        },
+      ),
     );
   }
 }

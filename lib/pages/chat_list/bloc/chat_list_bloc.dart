@@ -25,5 +25,9 @@ class ChatListBloc extends Bloc<ChatListEvent, ChatListState> {
     on<ChatListFetched>((event, emit) async {
       await _chatRepository.fetchJoinedChats();
     });
+
+    on<ChatListLeaved>((event, emit) async {
+      await _chatRepository.leave(chat: event.chat);
+    });
   }
 }

@@ -43,7 +43,7 @@ class ChatUserProvider {
   }
 
   Future<void> leave({required Chat chat}) async {
-    await _dio.delete(
+    await _dio.post(
       '/chat-users/leave',
       queryParameters: {
         'chatId': chat.id,

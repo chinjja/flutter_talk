@@ -34,9 +34,9 @@ class ChatRepository {
 
         _subscriptions.add(onChatChanged.listen((event) async {
           final chat = event.data;
-          final chatItem = await bindChat(chat);
           final old = await _joinedChatsChanged.first;
           if (event.isAdded) {
+            final chatItem = await bindChat(chat);
             _joinedChatsChanged.add([chatItem, ...old]);
           } else if (event.isRemoved) {
             _joinedChatsChanged
