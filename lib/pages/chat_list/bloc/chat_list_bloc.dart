@@ -17,7 +17,7 @@ class ChatListBloc extends Bloc<ChatListEvent, ChatListState> {
     on<ChatListStarted>((event, emit) async {
       emit(state.copyWith(status: ChatListStatus.loading));
       add(const ChatListFetched());
-      await emit.forEach(_chatRepository.onJoinedChatsChanged,
+      await emit.forEach(_chatRepository.onJoinedChats,
           onData: (List<ChatItem> data) {
         return state.copyWith(status: ChatListStatus.success, chats: data);
       });

@@ -98,7 +98,7 @@ class __FriendSelectionViewState extends State<_FriendSelectionView> {
     super.initState();
     context
         .read<ChatRepository>()
-        .onFriendsChanged
+        .onFriends
         .first
         .then((data) => setState(() => friends = data));
   }

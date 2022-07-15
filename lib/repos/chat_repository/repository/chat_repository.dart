@@ -99,8 +99,8 @@ class ChatRepository {
     });
   }
 
-  late final onJoinedChatsChanged = _joinedChatsChanged.stream;
-  late final onFriendsChanged = _friendsChanged.stream;
+  late final onJoinedChats = _joinedChatsChanged.stream;
+  late final onFriends = _friendsChanged.stream;
 
   late final onChatChanged = _chatListenProvider.onChatChanged;
   late final onFriendChanged = _chatListenProvider.onFriendChanged;

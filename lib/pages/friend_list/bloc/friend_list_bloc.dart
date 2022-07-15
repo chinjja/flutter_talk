@@ -18,7 +18,7 @@ class FriendListBloc extends Bloc<FriendListEvent, FriendListState> {
       emit(state.copyWith(status: FriendListStatus.loading));
       _chatRepository.fetchFriends();
       await emit.forEach(
-        _chatRepository.onFriendsChanged,
+        _chatRepository.onFriends,
         onData: (List<User> friends) {
           return state.copyWith(
             status: FriendListStatus.success,
