@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:talk/app/app.dart';
 import 'package:talk/pages/home/home.dart';
 import 'package:talk/pages/login/login.dart';
@@ -36,29 +37,75 @@ class App extends StatelessWidget {
   }
 }
 
-class AppView extends StatelessWidget {
+class AppView extends StatefulWidget {
   const AppView({Key? key}) : super(key: key);
 
   @override
+  State<AppView> createState() => _AppViewState();
+}
+
+class _AppViewState extends State<AppView> {
+  late final _router = GoRouter(
+    initialLocation: '/',
+    routes: [
+      GoRoute(
+        name: 'home',
+        path: '/:tab(home|chat|profile)',
+        builder: (context, state) {
+          final tab = state.params['tab'];
+          final idx = tab == 'home'
+              ? 0
+              : tab == 'chat'
+                  ? 1
+                  : 2;
+          return HomePage(tab: idx);
+        },
+      ),
+      GoRoute(
+        name: 'splash',
+        path: '/splash',
+        builder: (context, state) => const SplashView(),
+      ),
+      GoRoute(
+        name: 'login',
+        path: '/login',
+        builder: (context, state) => const LoginPage(),
+      ),
+    ],
+    redirect: (state) {
+      final bloc = context.read<AppBloc>();
+      switch (bloc.state.status) {
+        case AppStatus.unknown:
+          if (state.subloc != '/splash') {
+            return '/splash';
+          }
+          break;
+        case AppStatus.authentication:
+          if (state.subloc == '/login' || state.subloc == '/splash') {
+            return '/home';
+          }
+          break;
+        case AppStatus.unauthentication:
+          if (state.subloc != '/login') {
+            return '/login';
+          }
+          break;
+      }
+      return null;
+    },
+    refreshListenable: GoRouterRefreshStream(context.read<AppBloc>().stream),
+  );
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Talk',
+    return MaterialApp.router(
+      routeInformationProvider: _router.routeInformationProvider,
+      routeInformationParser: _router.routeInformationParser,
+      routerDelegate: _router.routerDelegate,
       theme: ThemeData(
         useMaterial3: true,
         primarySwatch: Colors.blue,
       ),
-      home: BlocBuilder<AppBloc, AppState>(
-        builder: (context, state) {
-          switch (state.status) {
-            case AppStatus.authentication:
-              return const HomePage();
-            case AppStatus.unauthentication:
-              return const LoginPage();
-            default:
-              return const SplashView();
-          }
-        },
-      ),
+      title: 'Talk',
     );
   }
 }

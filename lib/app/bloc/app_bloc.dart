@@ -11,6 +11,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       : _authRepository = authRepository,
         super(const AppState.unknown()) {
     on<AppInited>((event, emit) async {
+      await Future.delayed(const Duration(seconds: 1));
       await emit.onEach(_authRepository.onUserChanged, onData: (User? user) {
         if (user == null) {
           emit(const AppState.unauthentication());

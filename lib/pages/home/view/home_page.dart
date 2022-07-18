@@ -7,12 +7,13 @@ import 'package:talk/pages/settings/settings.dart';
 import '../home.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
+  final int tab;
+  const HomePage({Key? key, this.tab = 0}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => HomeBloc(),
+      create: (context) => HomeBloc()..add(HomeTapped(tab)),
       child: const HomeView(),
     );
   }
