@@ -19,7 +19,6 @@ class ChatUserListBloc extends Bloc<ChatUserListEvent, ChatUserListState> {
   ChatUserListBloc(this._chatRepository) : super(const ChatUserListState()) {
     on<ChatUserListStarted>((event, emit) async {
       if (state.status != FetchStatus.initial) return;
-
       emit(state.copyWith(
         status: FetchStatus.loading,
         chat: event.chat,

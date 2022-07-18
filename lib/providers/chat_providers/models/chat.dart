@@ -1,31 +1,48 @@
+import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:equatable/equatable.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 import 'models.dart';
 
-abstract class Chat extends Equatable {
+part 'chat.g.dart';
+
+@JsonSerializable()
+@CopyWith()
+class Chat extends Equatable {
   final int id;
-  final String dtype;
+
+  final bool visible;
+  final bool joinable;
+
+  final String? title;
+  final String? description;
+
+  final User? owner;
+
   final DateTime createdAt;
 
   const Chat({
     required this.id,
-    required this.dtype,
     required this.createdAt,
+    this.visible = false,
+    this.joinable = false,
+    this.title,
+    this.description,
+    this.owner,
   });
 
-  bool get isOpenChat => dtype == "open";
-  bool get isDirectChat => dtype == "direct";
-  bool get isGroupChat => dtype == 'group';
+  factory Chat.fromJson(Map<String, dynamic> json) => _$ChatFromJson(json);
 
-  factory Chat.fromJson(Map<String, dynamic> json) {
-    final dtype = json['dtype'];
-    switch (dtype) {
-      case 'open':
-        return OpenChat.fromJson(json);
-      default:
-        throw Exception('oops');
-    }
-  }
+  Map<String, dynamic> toJson() => _$ChatToJson(this);
 
-  Map<String, dynamic> toJson();
+  @override
+  List<Object?> get props => [
+        id,
+        createdAt,
+        visible,
+        joinable,
+        title,
+        description,
+        owner,
+      ];
 }

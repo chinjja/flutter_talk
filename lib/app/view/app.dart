@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:talk/app/app.dart';
+import 'package:talk/pages/chat/chat.dart';
+import 'package:talk/pages/chat_create/chat_create.dart';
 import 'package:talk/pages/home/home.dart';
 import 'package:talk/pages/login/login.dart';
 import 'package:talk/repos/repos.dart';
@@ -46,6 +48,7 @@ class AppView extends StatefulWidget {
 
 class _AppViewState extends State<AppView> {
   late final _router = GoRouter(
+    urlPathStrategy: UrlPathStrategy.path,
     initialLocation: '/',
     routes: [
       GoRoute(
@@ -60,6 +63,20 @@ class _AppViewState extends State<AppView> {
                   : 2;
           return HomePage(tab: idx);
         },
+        routes: [
+          GoRoute(
+            name: 'new-chat',
+            path: 'new-chat',
+            builder: (context, state) => const ChatCreatePage(),
+          ),
+          GoRoute(
+            name: 'chats',
+            path: 'chats/:chatId',
+            builder: (context, state) {
+              return ChatPage(chatId: int.parse(state.params['chatId']!));
+            },
+          ),
+        ],
       ),
       GoRoute(
         name: 'splash',

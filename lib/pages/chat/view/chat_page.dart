@@ -8,26 +8,21 @@ import 'package:talk/repos/repos.dart';
 import '../chat.dart';
 
 class ChatPage extends StatelessWidget {
-  static Route route({required Chat chat}) =>
-      MaterialPageRoute(builder: (_) => ChatPage(chat: chat));
-
-  final Chat chat;
-  const ChatPage({Key? key, required this.chat}) : super(key: key);
+  final int chatId;
+  const ChatPage({Key? key, required this.chatId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final user = context.read<AuthRepository>().user;
     final chatRepo = context.read<ChatRepository>();
+
     return MultiBlocProvider(
       providers: [
         BlocProvider(
             create: (context) => ChatBloc(
                   chatRepository: chatRepo,
-                )..add(ChatStarted(chat: chat, user: user!))),
-        BlocProvider(
-            create: (context) => ChatUserListBloc(
-                  chatRepo,
-                )..add(ChatUserListStarted(chat: chat))),
+                )..add(ChatStarted(chatId: chatId, user: user!))),
+        BlocProvider(create: (context) => ChatUserListBloc(chatRepo)),
       ],
       child: const ChatView(),
     );
@@ -57,9 +52,7 @@ class ChatView extends StatelessWidget {
           ),
         ),
       ),
-      endDrawer: const Drawer(
-        child: ChatUserListView(),
-      ),
+      endDrawer: const Drawer(child: ChatUserListView()),
     );
   }
 }
@@ -71,11 +64,11 @@ class _AppBarTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ChatBloc, ChatState>(
       builder: (context, state) {
-        final chat = state.chat as OpenChat?;
+        final chat = state.chat;
         if (chat == null) {
           return const SizedBox();
         }
-        return Text(chat.title);
+        return Text(chat.title ?? '제목 없음');
       },
     );
   }

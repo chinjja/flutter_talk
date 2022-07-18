@@ -1,19 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
+import 'package:talk/pages/chat/bloc/chat_bloc.dart';
 import 'package:talk/pages/chat_user_list/bloc/chat_user_list_bloc.dart';
 import 'package:talk/repos/repos.dart';
 
-class ChatUserListView extends StatelessWidget {
+class ChatUserListView extends StatefulWidget {
   const ChatUserListView({Key? key}) : super(key: key);
 
   @override
+  State<ChatUserListView> createState() => _ChatUserListViewState();
+}
+
+class _ChatUserListViewState extends State<ChatUserListView> {
+  @override
+  void initState() {
+    super.initState();
+    final chat = context.read<ChatBloc>().state.chat;
+    if (chat != null) {
+      context.read<ChatUserListBloc>().add(ChatUserListStarted(chat: chat));
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return const SafeArea(
-      child: CustomScrollView(
-        slivers: [
-          _MemberList(),
-        ],
+    return SafeArea(
+      child: BlocConsumer<ChatBloc, ChatState>(
+        listenWhen: (previous, current) => previous.chat != current.chat,
+        listener: (context, state) {
+          if (state.chat != null) {
+            context
+                .read<ChatUserListBloc>()
+                .add(ChatUserListStarted(chat: state.chat!));
+          }
+        },
+        builder: (context, state) {
+          if (state.chat == null) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          return const CustomScrollView(
+            slivers: [
+              _MemberList(),
+            ],
+          );
+        },
       ),
     );
   }

@@ -8,13 +8,13 @@ abstract class ChatEvent extends Equatable {
 }
 
 class ChatStarted extends ChatEvent {
-  final Chat chat;
+  final int chatId;
   final User user;
 
-  const ChatStarted({required this.chat, required this.user});
+  const ChatStarted({required this.chatId, required this.user});
 
   @override
-  List<Object> get props => [chat, user];
+  List<Object> get props => [chatId, user];
 }
 
 class ChatMessageChanged extends ChatEvent {

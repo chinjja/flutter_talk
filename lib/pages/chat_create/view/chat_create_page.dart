@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:talk/repos/repos.dart';
 
 import '../chat_create.dart';
 
 class ChatCreatePage extends StatelessWidget {
-  static Route route() =>
-      MaterialPageRoute(builder: (context) => const ChatCreatePage());
   const ChatCreatePage({Key? key}) : super(key: key);
 
   @override
@@ -18,7 +17,7 @@ class ChatCreatePage extends StatelessWidget {
         listenWhen: (previous, current) => previous.status != current.status,
         listener: (context, state) {
           if (state.status == ChatCreateSubmitStatus.success) {
-            Navigator.pop(context);
+            context.go('/chat/chats/${state.chatId!}');
           }
         },
         child: const ChatCreateView(),

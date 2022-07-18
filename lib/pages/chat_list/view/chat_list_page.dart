@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:talk/pages/chat/chat.dart';
-import 'package:talk/pages/chat_create/chat_create.dart';
 import 'package:talk/repos/repos.dart';
 
 import '../chat_list.dart';
@@ -34,7 +33,7 @@ class ChatListView extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () {
-              Navigator.push(context, ChatCreatePage.route());
+              context.go('/chat/new-chat');
             },
           )
         ],
@@ -110,7 +109,7 @@ class _ChatTile extends StatelessWidget {
           ],
         ),
         onTap: () {
-          Navigator.push(context, ChatPage.route(chat: chatItem.chat));
+          context.go('/chat/chats/${chatItem.chat.id}');
         },
       ),
     );
@@ -133,24 +132,21 @@ class _Title extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (item.chat is OpenChat) {
-      final chat = item.chat as OpenChat;
-      return Row(
-        children: [
-          Text(
-            chat.title,
-            maxLines: 1,
-          ),
-          const SizedBox(width: 4),
-          Flexible(
-              child: Text(
-            '${item.info.userCount}',
-            style: TextStyle(color: Theme.of(context).colorScheme.primary),
-          )),
-        ],
-      );
-    }
-    return const Text('제목없는 채팅');
+    final chat = item.chat;
+    return Row(
+      children: [
+        Text(
+          chat.title ?? '제목없는 채팅',
+          maxLines: 1,
+        ),
+        const SizedBox(width: 4),
+        Flexible(
+            child: Text(
+          '${item.info.userCount}',
+          style: TextStyle(color: Theme.of(context).colorScheme.primary),
+        )),
+      ],
+    );
   }
 }
 

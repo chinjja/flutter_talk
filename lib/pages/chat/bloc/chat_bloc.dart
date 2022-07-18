@@ -22,14 +22,14 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         super(const ChatState()) {
     on<ChatStarted>((event, emit) async {
       if (state.chat == null) {
+        final chat = await _chatRepository.getChat(event.chatId);
         emit(state.copyWith(
           fetchStatus: ChatStatus.inProgress,
-          chat: event.chat,
+          chat: chat,
           user: event.user,
         ));
-        await _chatRepository.read(chat: event.chat);
-        final data =
-            await _chatRepository.getMessages(chat: event.chat, limit: 50);
+        await _chatRepository.read(chat: chat);
+        final data = await _chatRepository.getMessages(chat: chat, limit: 50);
         emit(state.copyWith(
           fetchStatus: ChatStatus.success,
           messages: data,
@@ -40,7 +40,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           _chatRepository.onChatMessageChanged
               .where((e) => e.isAdded)
               .map((e) => e.data)
-              .where((e) => e.chat.id == event.chat.id)
+              .where((e) => e.chat.id == chat.id)
               .listen(
             (message) {
               add(ChatMessageReceived(message));

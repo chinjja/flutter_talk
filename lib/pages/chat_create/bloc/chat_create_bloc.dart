@@ -25,10 +25,13 @@ class ChatCreateBloc extends Bloc<ChatCreateEvent, ChatCreateState> {
     on<ChatCreateSubmitted>((event, emit) async {
       if (state.isValid) {
         emit(state.copyWith(status: ChatCreateSubmitStatus.inProgress));
-        await _chatRepository.createOpenChat(
+        final chatId = await _chatRepository.createOpenChat(
           title: state.title,
         );
-        emit(state.copyWith(status: ChatCreateSubmitStatus.success));
+        emit(state.copyWith(
+          status: ChatCreateSubmitStatus.success,
+          chatId: chatId,
+        ));
       }
     });
   }
