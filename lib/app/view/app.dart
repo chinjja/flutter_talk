@@ -6,6 +6,7 @@ import 'package:talk/pages/chat/chat.dart';
 import 'package:talk/pages/chat_create/chat_create.dart';
 import 'package:talk/pages/home/home.dart';
 import 'package:talk/pages/login/login.dart';
+import 'package:talk/pages/verify_email/verify_email.dart';
 import 'package:talk/repos/repos.dart';
 
 class App extends StatelessWidget {
@@ -88,6 +89,11 @@ class _AppViewState extends State<AppView> {
         path: '/login',
         builder: (context, state) => const LoginPage(),
       ),
+      GoRoute(
+        name: 'verify-email',
+        path: '/verify-email',
+        builder: (context, state) => const VerifyEmailPage(),
+      ),
     ],
     redirect: (state) {
       final bloc = context.read<AppBloc>();
@@ -98,13 +104,20 @@ class _AppViewState extends State<AppView> {
           }
           break;
         case AppStatus.authentication:
-          if (state.subloc == '/login' || state.subloc == '/splash') {
+          if (state.subloc == '/login' ||
+              state.subloc == '/splash' ||
+              state.subloc == '/verify-email') {
             return '/home';
           }
           break;
         case AppStatus.unauthentication:
           if (state.subloc != '/login') {
             return '/login';
+          }
+          break;
+        case AppStatus.emailNotVerified:
+          if (state.subloc != '/verify-email') {
+            return '/verify-email';
           }
           break;
       }

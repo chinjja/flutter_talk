@@ -4,6 +4,7 @@ enum AppStatus {
   unknown,
   authentication,
   unauthentication,
+  emailNotVerified,
 }
 
 class AppState extends Equatable {
@@ -19,6 +20,12 @@ class AppState extends Equatable {
         );
   const AppState.unauthentication()
       : this._(status: AppStatus.unauthentication);
+
+  const AppState.emailNotVerified({required User user})
+      : this._(
+          status: AppStatus.emailNotVerified,
+          user: user,
+        );
 
   @override
   List<Object?> get props => [status, user];

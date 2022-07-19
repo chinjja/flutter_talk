@@ -20,7 +20,7 @@ class AuthProvider {
     );
   }
 
-  Future<Token> login({
+  Future<LoginResponse> login({
     required String username,
     required String password,
   }) async {
@@ -31,10 +31,25 @@ class AuthProvider {
         'password': password,
       },
     );
-    return Token.fromJson(res.data);
+    return LoginResponse.fromJson(res.data);
   }
 
   Future<void> logout() async {
     await _dio.post('/auth/logout');
+  }
+
+  Future<void> sendCode() async {
+    await _dio.post('/verification/send-code');
+  }
+
+  Future<void> verifyCode(int code) async {
+    await _dio.post('/verification/verify-code', data: {
+      'code': code,
+    });
+  }
+
+  Future<bool> isVerified() async {
+    final res = await _dio.get('/verification/is-verified');
+    return res.data;
   }
 }

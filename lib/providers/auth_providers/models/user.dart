@@ -2,6 +2,8 @@ import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import 'token.dart';
+
 part 'user.g.dart';
 
 @JsonSerializable()
@@ -18,4 +20,23 @@ class User extends Equatable {
 
   @override
   List<Object?> get props => [username];
+}
+
+@JsonSerializable()
+@CopyWith()
+class LoginResponse extends Equatable {
+  final bool emailVerified;
+  final Token token;
+
+  const LoginResponse({
+    required this.emailVerified,
+    required this.token,
+  });
+
+  factory LoginResponse.fromJson(Map<String, dynamic> json) =>
+      _$LoginResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$LoginResponseToJson(this);
+  @override
+  List<Object?> get props => [emailVerified, token];
 }

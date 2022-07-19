@@ -12,11 +12,14 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         super(const AppState.unknown()) {
     on<AppInited>((event, emit) async {
       await Future.delayed(const Duration(seconds: 1));
-      await emit.onEach(_authRepository.onUserChanged, onData: (User? user) {
-        if (user == null) {
+      await emit.onEach(_authRepository.onUserChanged,
+          onData: (Authentication? auth) {
+        if (auth == null) {
           emit(const AppState.unauthentication());
-        } else {
-          emit(AppState.authentication(user: user));
+        } else if (auth.emailVerified) {
+          emit(AppState.authentication(user: auth.principal));
+        } else if (!auth.emailVerified) {
+          emit(AppState.emailNotVerified(user: auth.principal));
         }
       });
     });

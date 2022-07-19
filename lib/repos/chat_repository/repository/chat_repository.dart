@@ -23,14 +23,14 @@ class ChatRepository {
     this._friendProvider,
     this._chatListenProvider,
   ) {
-    _authRepository.onUserChanged.listen((user) {
-      if (user == null) {
+    _authRepository.onUserChanged.listen((auth) {
+      if (auth == null) {
         _chatListenProvider.deactivate();
         _subscriptions.clear();
-      } else {
+      } else if (auth.emailVerified) {
         fetchFriends();
         fetchJoinedChats();
-        _chatListenProvider.activate(user);
+        _chatListenProvider.activate(auth.principal);
 
         _subscriptions.add(onChatChanged.listen((event) async {
           final chat = event.data;

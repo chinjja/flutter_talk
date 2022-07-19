@@ -29,7 +29,6 @@ void main() async {
     friendProvider,
     chatListenProvider,
   );
-  await authRepository.init();
 
   Future<bool> _refresh() async {
     final token = await tokenProvider.read();
@@ -78,6 +77,9 @@ void main() async {
       return handler.next(error);
     },
   ));
+
+  await authRepository.init();
+
   runApp(
     App(
       authRepository: authRepository,
