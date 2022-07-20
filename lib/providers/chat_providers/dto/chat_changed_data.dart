@@ -24,3 +24,18 @@ class ChatChangedData extends Equatable {
   @override
   List<Object?> get props => [objectType, command, data];
 }
+
+@CopyWith()
+class ChatChanged<T extends Equatable> extends Equatable {
+  final String command;
+  final T data;
+
+  const ChatChanged({required this.command, required this.data});
+
+  bool get isAdded => command == "added";
+  bool get isUpdated => command == "updated";
+  bool get isRemoved => command == "removed";
+
+  @override
+  List<Object?> get props => [command, data];
+}

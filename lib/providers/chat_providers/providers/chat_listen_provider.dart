@@ -15,21 +15,22 @@ class ChatListenProvider {
 
   StompClient? _client;
 
-  final _chatChanged = PublishSubject<ChatEvent<Chat>>();
-  final _friendChanged = PublishSubject<ChatEvent<User>>();
+  final _chatChanged = PublishSubject<ChatChanged<Chat>>();
+  final _friendChanged = PublishSubject<ChatChanged<User>>();
 
-  final _messageChanegd = PublishSubject<ChatEvent<ChatMessage>>();
-  final _chatUserChanged = PublishSubject<ChatEvent<ChatUser>>();
+  final _messageChanegd = PublishSubject<ChatChanged<ChatMessage>>();
+  final _chatUserChanged = PublishSubject<ChatChanged<ChatUser>>();
 
   final _chatUnsubscribe = <int, StompUnsubscribe>{};
 
   ChatListenProvider(this._dio, this._chatProvider);
 
-  Stream<ChatEvent<Chat>> get onChatChanged => _chatChanged.stream;
-  Stream<ChatEvent<User>> get onFriendChanged => _friendChanged.stream;
-  Stream<ChatEvent<ChatMessage>> get onChatMessageChanged =>
+  Stream<ChatChanged<Chat>> get onChatChanged => _chatChanged.stream;
+  Stream<ChatChanged<User>> get onFriendChanged => _friendChanged.stream;
+  Stream<ChatChanged<ChatMessage>> get onChatMessageChanged =>
       _messageChanegd.stream;
-  Stream<ChatEvent<ChatUser>> get onChatUserChanged => _chatUserChanged.stream;
+  Stream<ChatChanged<ChatUser>> get onChatUserChanged =>
+      _chatUserChanged.stream;
 
   void activate(User user) {
     _client ??= StompClient(
@@ -76,7 +77,7 @@ class ChatListenProvider {
         switch (data.objectType) {
           case 'Chat':
             final chat = Chat.fromJson(data.data);
-            _chatChanged.add(ChatEvent(command: data.command, data: chat));
+            _chatChanged.add(ChatChanged(command: data.command, data: chat));
             switch (data.command) {
               case 'added':
                 _listenChat(chat: chat);
@@ -88,7 +89,8 @@ class ChatListenProvider {
             break;
           case 'Friend':
             final friend = User.fromJson(data.data);
-            _friendChanged.add(ChatEvent(command: data.command, data: friend));
+            _friendChanged
+                .add(ChatChanged(command: data.command, data: friend));
             break;
         }
       },
@@ -120,7 +122,7 @@ class ChatListenProvider {
           switch (data.objectType) {
             case 'ChatUser':
               final chatUser = ChatUser.fromJson(data.data);
-              _chatUserChanged.add(ChatEvent(
+              _chatUserChanged.add(ChatChanged(
                 command: data.command,
                 data: chatUser,
               ));
@@ -129,7 +131,7 @@ class ChatListenProvider {
               final list = List.castFrom(data.data);
               final chatUsers = list.map((e) => ChatUser.fromJson(e)).toList();
               for (final chatUser in chatUsers) {
-                _chatUserChanged.add(ChatEvent(
+                _chatUserChanged.add(ChatChanged(
                   command: data.command,
                   data: chatUser,
                 ));
@@ -137,7 +139,7 @@ class ChatListenProvider {
               break;
             case 'ChatMessage':
               final message = ChatMessage.fromJson(data.data);
-              _messageChanegd.add(ChatEvent(
+              _messageChanegd.add(ChatChanged(
                 command: data.command,
                 data: message,
               ));

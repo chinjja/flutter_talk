@@ -42,3 +42,16 @@ class ChatMessageReceived extends ChatEvent {
 class ChatMessageFetchMore extends ChatEvent {
   const ChatMessageFetchMore();
 }
+
+class ChatReadEvent extends ChatEvent {
+  const ChatReadEvent();
+}
+
+class ChatUsersChanged extends ChatEvent {
+  final List<ChatUser> chatUsers;
+
+  const ChatUsersChanged(this.chatUsers);
+
+  @override
+  List<Object> get props => [chatUsers];
+}

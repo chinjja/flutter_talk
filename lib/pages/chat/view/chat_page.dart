@@ -128,6 +128,20 @@ class __MessageViewState extends State<_MessageView> {
                   : null;
               final message = state.messages[index];
               final myMessage = message.sender.username == state.user?.username;
+              var unreadCount = 0;
+              var unreadOverflow = false;
+              for (final chatUser in state.chatUsers) {
+                if (chatUser.user == state.user) continue;
+
+                if (message.instant.compareTo(chatUser.readAt) > 0) {
+                  unreadCount++;
+                  if (unreadCount == 100) {
+                    unreadCount--;
+                    unreadOverflow = true;
+                    break;
+                  }
+                }
+              }
               if (myMessage) {
                 return _MyMessageTile(
                   prevMessage: prevMessage,
@@ -137,6 +151,8 @@ class __MessageViewState extends State<_MessageView> {
               return _MessageTile(
                 prevMessage: prevMessage,
                 message: message,
+                unreadCount: unreadCount,
+                unreadOverflow: unreadOverflow,
               );
             },
           );
@@ -272,45 +288,84 @@ class _MyMessageTile extends StatelessWidget {
 class _MessageTile extends StatelessWidget {
   final ChatMessage? prevMessage;
   final ChatMessage message;
+  final int unreadCount;
+  final bool unreadOverflow;
   const _MessageTile({
     Key? key,
     required this.prevMessage,
     required this.message,
+    required this.unreadCount,
+    required this.unreadOverflow,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final firstMessage = message.sender != prevMessage?.sender;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: 48,
-          child: firstMessage
-              ? const CircleAvatar(
-                  child: Icon(Icons.person),
-                )
-              : null,
-        ),
-        Flexible(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (firstMessage) Text(message.sender.username),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  _MessageText(text: message.message),
-                  _TimeText(
-                    time: message.instant,
-                    alignment: Alignment.bottomLeft,
-                  ),
-                ],
-              ),
-            ],
+    return Padding(
+      padding: firstMessage ? const EdgeInsets.only(top: 10) : EdgeInsets.zero,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 48,
+            child: firstMessage
+                ? const CircleAvatar(
+                    child: Icon(Icons.person),
+                  )
+                : null,
           ),
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (firstMessage) Text(message.sender.username),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    _MessageText(text: message.message),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _UnreadCount(
+                            unreadCount: unreadCount, overflow: unreadOverflow),
+                        _TimeText(
+                          time: message.instant,
+                          alignment: Alignment.bottomLeft,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _UnreadCount extends StatelessWidget {
+  final int unreadCount;
+  final bool overflow;
+  const _UnreadCount({
+    Key? key,
+    required this.unreadCount,
+    required this.overflow,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Visibility(
+      visible: unreadCount > 0,
+      child: Text(
+        '$unreadCount${overflow ? '+' : ''}',
+        style: const TextStyle(
+          color: Colors.orange,
+          fontSize: 10,
         ),
-      ],
+      ),
     );
   }
 }

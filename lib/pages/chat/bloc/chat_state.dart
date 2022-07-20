@@ -12,6 +12,7 @@ class ChatState extends Equatable {
   final ChatStatus fetchStatus;
   final ChatStatus submitStatus;
   final List<ChatMessage> messages;
+  final List<ChatUser> chatUsers;
   final Chat? chat;
   final User? user;
   final String message;
@@ -23,6 +24,7 @@ class ChatState extends Equatable {
     this.fetchStatus = ChatStatus.initial,
     this.submitStatus = ChatStatus.initial,
     this.messages = const [],
+    this.chatUsers = const [],
     this.chat,
     this.user,
     this.message = '',
@@ -34,6 +36,7 @@ class ChatState extends Equatable {
         fetchStatus,
         submitStatus,
         messages,
+        chatUsers,
         chat,
         user,
         message,
