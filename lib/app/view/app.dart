@@ -50,7 +50,7 @@ class AppView extends StatefulWidget {
 class _AppViewState extends State<AppView> {
   late final _router = GoRouter(
     urlPathStrategy: UrlPathStrategy.path,
-    initialLocation: '/',
+    initialLocation: '/home',
     routes: [
       GoRoute(
         name: 'home',
