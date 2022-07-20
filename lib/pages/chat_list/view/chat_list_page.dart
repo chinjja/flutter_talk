@@ -141,10 +141,11 @@ class _Title extends StatelessWidget {
         ),
         const SizedBox(width: 4),
         Flexible(
-            child: Text(
-          '${item.info.userCount}',
-          style: TextStyle(color: Theme.of(context).colorScheme.primary),
-        )),
+          child: Text(
+            '${item.info.userCount}',
+            style: TextStyle(color: Theme.of(context).colorScheme.primary),
+          ),
+        ),
       ],
     );
   }
@@ -171,16 +172,17 @@ class _Badge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return count == 0
-        ? const SizedBox()
-        : SizedBox(
-            width: 32,
-            height: 32,
-            child: Chip(
-              label:
-                  Text('$count', style: const TextStyle(color: Colors.white)),
-              backgroundColor: Colors.deepOrange,
-            ),
-          );
+    return Visibility(
+      visible: count > 0,
+      child: Chip(
+        label: Text(
+          '$count',
+          style: const TextStyle(
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: Colors.deepOrange,
+      ),
+    );
   }
 }
