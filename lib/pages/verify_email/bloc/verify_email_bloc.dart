@@ -32,7 +32,7 @@ class VerifyEmailBloc extends Bloc<VerifyEmailEvent, VerifyEmailState> {
     }, transformer: restartable());
 
     on<VerifyEmailSubmitted>((event, emit) async {
-      final code = int.parse(state.code);
+      final code = state.code;
       try {
         emit(state.copyWith(submitStatus: FetchStatus.loading));
 

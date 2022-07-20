@@ -42,7 +42,7 @@ class AuthProvider {
     await _dio.post('/verification/send-code');
   }
 
-  Future<void> verifyCode(int code) async {
+  Future<void> verifyCode(String code) async {
     await _dio.post('/verification/verify-code', data: {
       'code': code,
     });

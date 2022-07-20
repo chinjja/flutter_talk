@@ -26,7 +26,7 @@ void main() {
       'emits [unauthentication] when AppInited without auth is added.',
       build: () => bloc,
       setUp: () {
-        when(() => authRepository.onUserChanged)
+        when(() => authRepository.onAuthChanged)
             .thenAnswer((_) => Stream.value(null));
       },
       act: (bloc) => bloc.add(AppInited()),
@@ -39,7 +39,7 @@ void main() {
       'emits [authentication] when AppInited with auth is added.',
       build: () => bloc,
       setUp: () {
-        when(() => authRepository.onUserChanged).thenAnswer(
+        when(() => authRepository.onAuthChanged).thenAnswer(
           (_) => Stream.value(
             Authentication(
               emailVerified: true,
@@ -58,7 +58,7 @@ void main() {
       'emits [emailNotVerified] when AppInited is added.',
       build: () => bloc,
       setUp: () {
-        when(() => authRepository.onUserChanged).thenAnswer(
+        when(() => authRepository.onAuthChanged).thenAnswer(
           (_) => Stream.value(
             Authentication(
               emailVerified: false,

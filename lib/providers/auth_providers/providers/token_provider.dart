@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 import '../auth_providers.dart';
 
@@ -32,5 +33,13 @@ class TokenProvider {
   Future<void> clear() async {
     await _storage.delete(key: _accessTokenKey);
     await _storage.delete(key: _refreshTokenKey);
+  }
+
+  bool isExpired(String token) {
+    return JwtDecoder.isExpired(token);
+  }
+
+  Map<String, dynamic> decode(String token) {
+    return JwtDecoder.decode(token);
   }
 }

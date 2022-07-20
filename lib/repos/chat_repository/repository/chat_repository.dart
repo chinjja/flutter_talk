@@ -23,7 +23,7 @@ class ChatRepository {
     this._friendProvider,
     this._chatListenProvider,
   ) {
-    _authRepository.onUserChanged.listen((auth) {
+    _authRepository.onAuthChanged.listen((auth) {
       if (auth == null) {
         _chatListenProvider.deactivate();
         _subscriptions.clear();
@@ -36,7 +36,7 @@ class ChatRepository {
           final chat = event.data;
           final old = await _joinedChatsChanged.first;
           if (event.isAdded) {
-            final chatItem = await bindChat(chat);
+            final chatItem = await _bindChat(chat);
             _joinedChatsChanged.add([chatItem, ...old]);
           } else if (event.isRemoved) {
             _joinedChatsChanged
@@ -88,7 +88,7 @@ class ChatRepository {
                 ),
               );
             } else if (event.isUpdated) {
-              return await bindChat(e.chat);
+              return await _bindChat(e.chat);
             } else {
               return e;
             }
@@ -118,13 +118,13 @@ class ChatRepository {
   Future<void> fetchJoinedChats() async {
     final chats = await getChats(type: ChatType.join);
     final list = await Stream.fromIterable(chats)
-        .asyncMap((event) => bindChat(event))
+        .asyncMap((event) => _bindChat(event))
         .toList();
     list.sort();
     _joinedChatsChanged.add(list);
   }
 
-  Future<ChatItem> bindChat(Chat chat) async {
+  Future<ChatItem> _bindChat(Chat chat) async {
     final info = await _chatProvider.getChatInfo(chat: chat);
     return ChatItem(
       chat: chat,

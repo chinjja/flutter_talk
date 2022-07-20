@@ -1,0 +1,170 @@
+// ignore_for_file: prefer_const_constructors
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:talk/repos/repos.dart';
+
+import '../../mocks/mocks.dart';
+
+void main() {
+  group('AuthRepository', () {
+    const token = Token(accessToken: 'a', refreshToken: 'b');
+    const authentication =
+        Authentication(principal: User(username: "user"), emailVerified: true);
+
+    late AuthProvider authProvider;
+    late TokenProvider tokenProvider;
+    late AuthRepository authRepository;
+
+    setUp(() {
+      authProvider = MockAuthProvider();
+      tokenProvider = MockTokenProvider();
+      authRepository = AuthRepository(authProvider, tokenProvider);
+    });
+
+    group('init()', () {
+      test('when token is not exists then emits null', () async {
+        when(() => tokenProvider.read()).thenAnswer((_) async => null);
+        when(() => tokenProvider.clear()).thenAnswer((_) => Future.value());
+
+        authRepository.init();
+
+        await expectLater(authRepository.onAuthChanged, emits(null));
+        verify(() => tokenProvider.clear()).called(1);
+        verifyNever(() => authProvider.isVerified());
+      });
+
+      test('when refresh token is expired then emits null', () async {
+        when(() => tokenProvider.read()).thenAnswer((_) async => token);
+        when(() => tokenProvider.isExpired(token.refreshToken))
+            .thenReturn(true);
+        when(() => tokenProvider.clear()).thenAnswer((_) => Future.value());
+
+        authRepository.init();
+
+        await expectLater(authRepository.onAuthChanged, emits(null));
+        verify(() => tokenProvider.clear()).called(1);
+        verifyNever(() => authProvider.isVerified());
+      });
+
+      test('when token is not expired then emits authentication', () async {
+        when(() => tokenProvider.read()).thenAnswer((_) async => token);
+        when(() => tokenProvider.isExpired(token.refreshToken))
+            .thenReturn(false);
+        when(() => tokenProvider.decode(token.accessToken))
+            .thenReturn({'sub': 'user'});
+        when(() => authProvider.isVerified()).thenAnswer((_) async => true);
+
+        authRepository.init();
+
+        await expectLater(authRepository.onAuthChanged, emits(authentication));
+
+        verifyNever(() => tokenProvider.clear());
+        verify(() => authProvider.isVerified()).called(1);
+      });
+    });
+
+    group('register()', () {
+      test(
+          'when username and password is passed then register() should be called',
+          () async {
+        when(() => authProvider.register(
+              username: 'user',
+              password: '1234',
+            )).thenAnswer((_) async => {});
+
+        await authRepository.register(
+          username: 'user',
+          password: '1234',
+        );
+        verify(() => authProvider.register(
+              username: 'user',
+              password: '1234',
+            )).called(1);
+      });
+    });
+
+    group('login()', () {
+      test('when username and password is passed then emits authentication',
+          () async {
+        when(() => authProvider.login(
+              username: 'user',
+              password: '1234',
+            )).thenAnswer((_) async => LoginResponse(
+              emailVerified: true,
+              token: token,
+            ));
+        when(() => tokenProvider.write(token)).thenAnswer((_) async => {});
+
+        authRepository.login(
+          username: 'user',
+          password: '1234',
+        );
+
+        await expectLater(authRepository.onAuthChanged, emits(authentication));
+        expect(authRepository.user, User(username: 'user'));
+
+        verify(() => authProvider.login(
+              username: 'user',
+              password: '1234',
+            )).called(1);
+        verify(() => tokenProvider.write(token)).called(1);
+      });
+    });
+
+    group('logout()', () {
+      test('when logout() is success then should emit null', () async {
+        when(() => authProvider.logout()).thenAnswer((_) async => {});
+        when(() => tokenProvider.clear()).thenAnswer((_) async => {});
+
+        authRepository.logout();
+
+        await expectLater(authRepository.onAuthChanged, emits(null));
+        expect(authRepository.user, isNull);
+
+        verify(() => authProvider.logout()).called(1);
+        verify(() => tokenProvider.clear()).called(1);
+      });
+      test('when logout() is throw then should emit null', () async {
+        when(() => authProvider.logout()).thenThrow(Exception('oops'));
+        when(() => tokenProvider.clear()).thenAnswer((_) async => {});
+
+        authRepository.logout();
+
+        await expectLater(authRepository.onAuthChanged, emits(null));
+        expect(authRepository.user, isNull);
+
+        verify(() => tokenProvider.clear()).called(1);
+      });
+      test('when clear() is throw then should emit null', () async {
+        when(() => authProvider.logout()).thenThrow(Exception('oops'));
+
+        authRepository.logout();
+
+        await expectLater(authRepository.onAuthChanged, emits(null));
+        expect(authRepository.user, isNull);
+      });
+    });
+
+    group('sendCode()', () {
+      test('test name', () async {
+        when(() => authProvider.sendCode()).thenAnswer((_) async => {});
+        await authRepository.sendCode();
+        verify(() => authProvider.sendCode()).called(1);
+      });
+    });
+
+    group('verifyCode()', () {
+      test('when verifyCode() is success then should success', () async {
+        when(() => authProvider.verifyCode("1234")).thenAnswer((_) async => {});
+        when(() => tokenProvider.read()).thenAnswer((_) async => token);
+        when(() => tokenProvider.decode(token.accessToken))
+            .thenReturn({'sub': 'user'});
+        authRepository.verifyCode("1234");
+
+        await expectLater(authRepository.onAuthChanged, emits(authentication));
+        verify(() => authProvider.verifyCode("1234")).called(1);
+      });
+    });
+  });
+}

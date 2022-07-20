@@ -1,38 +1,40 @@
 import 'dart:developer';
 
-import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:talk/providers/providers.dart';
 
 import '../auth_repository.dart';
 
 class AuthRepository {
-  final _userChanged = BehaviorSubject<Authentication?>.seeded(null);
+  final _authChanged = BehaviorSubject<Authentication?>();
   final AuthProvider _authProvider;
   final TokenProvider _tokenProvider;
-  User? user;
+  User? _user;
 
   AuthRepository(this._authProvider, this._tokenProvider);
 
-  Stream<Authentication?> get onUserChanged => _userChanged;
+  Stream<Authentication?> get onAuthChanged => _authChanged;
+  User? get user => _user;
 
   Future init() async {
-    final data = await _tokenProvider.read();
-    if (data != null && !JwtDecoder.isExpired(data.refreshToken)) {
-      try {
+    try {
+      final data = await _tokenProvider.read();
+      if (data != null && !_tokenProvider.isExpired(data.refreshToken)) {
         final verified = await isVerified();
-        final map = JwtDecoder.decode(data.accessToken);
+        final map = _tokenProvider.decode(data.accessToken);
         var user = User(username: map['sub']);
-        this.user = user;
-        _userChanged.add(Authentication(
+        _user = user;
+        _authChanged.add(Authentication(
           principal: user,
           emailVerified: verified,
         ));
-      } catch (e) {
-        _tokenProvider.clear();
-        log(e.toString());
+        return;
       }
+    } catch (e) {
+      log(e.toString());
     }
+    _tokenProvider.clear();
+    _authChanged.add(null);
   }
 
   Future<void> register({
@@ -49,32 +51,43 @@ class AuthRepository {
     final res =
         await _authProvider.login(username: username, password: password);
     var user = User(username: username);
-    this.user = user;
+    _user = user;
     await _tokenProvider.write(res.token);
 
-    _userChanged.add(Authentication(
+    _authChanged.add(Authentication(
       principal: user,
       emailVerified: res.emailVerified,
     ));
   }
 
   Future<void> logout() async {
-    await _authProvider.logout();
-    user = null;
-    await _tokenProvider.clear();
-    _userChanged.add(null);
+    try {
+      await _authProvider.logout();
+    } catch (_) {}
+    _user = null;
+    try {
+      await _tokenProvider.clear();
+    } catch (_) {}
+    _authChanged.add(null);
   }
 
   Future<void> sendCode() async {
     await _authProvider.sendCode();
   }
 
-  Future<void> verifyCode(int code) async {
+  Future<void> verifyCode(String code) async {
     await _authProvider.verifyCode(code);
 
-    final auth = await _userChanged.first.timeout(const Duration(seconds: 1));
-    if (auth != null) {
-      _userChanged.add(auth.copyWith.emailVerified(true));
+    final data = await _tokenProvider.read();
+    if (data != null) {
+      final map = _tokenProvider.decode(data.accessToken);
+      var user = User(username: map['sub']);
+
+      _user = user;
+      _authChanged.add(Authentication(
+        principal: user,
+        emailVerified: true,
+      ));
     }
   }
 
