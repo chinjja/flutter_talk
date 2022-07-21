@@ -6,7 +6,7 @@ import 'models.dart';
 
 part 'chat_message.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 @CopyWith()
 class ChatMessage extends Equatable {
   final int id;

@@ -6,7 +6,7 @@ import '../chat_providers.dart';
 
 part 'chat_info.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 @CopyWith()
 class ChatInfo extends Equatable {
   final int unreadCount;

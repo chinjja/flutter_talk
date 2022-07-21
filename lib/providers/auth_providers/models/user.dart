@@ -22,7 +22,7 @@ class User extends Equatable {
   List<Object?> get props => [username];
 }
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 @CopyWith()
 class LoginResponse extends Equatable {
   final bool emailVerified;

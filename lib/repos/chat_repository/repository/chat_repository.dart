@@ -163,10 +163,9 @@ class ChatRepository {
   }
 
   Future<ChatMessage> getMessage({
-    required Chat chat,
     required int id,
   }) async {
-    return _chatMessageProvider.getMessage(chat: chat, id: id);
+    return _chatMessageProvider.getMessage(id: id);
   }
 
   Future<List<ChatMessage>> getMessages({

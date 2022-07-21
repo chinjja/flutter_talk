@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:talk/repos/repos.dart';
 
@@ -16,3 +18,7 @@ class MockChatMessageProvider extends Mock implements ChatMessageProvider {}
 class MockFriendProvider extends Mock implements FriendProvider {}
 
 class MockChatListenProvider extends Mock implements ChatListenProvider {}
+
+class MockDio extends Mock implements Dio {}
+
+class MockFlutterSecureStorage extends Mock implements FlutterSecureStorage {}

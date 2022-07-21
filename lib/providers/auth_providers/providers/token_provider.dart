@@ -8,9 +8,11 @@ import '../auth_providers.dart';
 class TokenProvider {
   final _accessTokenKey = 'ACCESS_TOKEN';
   final _refreshTokenKey = 'REFRESH_TOKEN';
-  final _storage = const FlutterSecureStorage();
+  final FlutterSecureStorage _storage;
   bool _init = false;
   Token? _token;
+
+  TokenProvider([this._storage = const FlutterSecureStorage()]);
 
   Future<Token?> read() async {
     if (!_init) {

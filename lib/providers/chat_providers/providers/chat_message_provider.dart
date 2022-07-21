@@ -24,7 +24,6 @@ class ChatMessageProvider {
   }
 
   Future<ChatMessage> getMessage({
-    required Chat chat,
     required int id,
   }) async {
     final res = await _dio.get('/messages/$id');
