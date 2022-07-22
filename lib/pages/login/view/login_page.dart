@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:talk/pages/register/register.dart';
+import 'package:formz/formz.dart';
+import 'package:go_router/go_router.dart';
 import 'package:talk/repos/repos.dart';
 
 import '../login.dart';
@@ -25,10 +26,9 @@ class LoginView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Login')),
       body: BlocListener<LoginBloc, LoginState>(
-        listenWhen: (previous, current) =>
-            previous.submitStatus != current.submitStatus,
+        listenWhen: (previous, current) => previous.status != current.status,
         listener: (context, state) {
-          if (state.submitStatus == LoginSubmitStatus.failure) {
+          if (state.status.isSubmissionFailure) {
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(
@@ -74,8 +74,10 @@ class _UsernameTextField extends StatelessWidget {
             context.read<LoginBloc>().add(LoginUsernameChanged(username));
           },
           decoration: InputDecoration(
-            hintText: 'Username',
-            errorText: state.usernameError,
+            hintText: 'Username (Email)',
+            errorText: state.username.invalid
+                ? 'enter username formatted email'
+                : null,
           ),
         );
       },
@@ -97,7 +99,7 @@ class _PasswordTextField extends StatelessWidget {
           },
           decoration: InputDecoration(
             hintText: 'Password',
-            errorText: state.passwordError,
+            errorText: state.password.invalid ? 'invalid password' : null,
           ),
         );
       },
@@ -113,12 +115,12 @@ class _SubmitButton extends StatelessWidget {
     return BlocBuilder<LoginBloc, LoginState>(
       builder: (context, state) {
         return ElevatedButton(
-          onPressed: state.isValid
-              ? () {
+          onPressed: state.status.isInvalid
+              ? null
+              : () {
                   context.read<LoginBloc>().add(const LoginSubmitted());
-                }
-              : null,
-          child: state.submitStatus == LoginSubmitStatus.inProgress
+                },
+          child: state.status.isSubmissionInProgress
               ? const CircularProgressIndicator()
               : const Text('Submit'),
         );
@@ -136,7 +138,7 @@ class _RegisterButton extends StatelessWidget {
       builder: (context, state) {
         return ElevatedButton(
           onPressed: () {
-            Navigator.push(context, RegisterPage.route());
+            context.go('/login/register');
           },
           child: const Text('Register'),
         );

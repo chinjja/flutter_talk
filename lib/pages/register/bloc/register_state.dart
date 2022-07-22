@@ -1,40 +1,24 @@
 part of 'register_bloc.dart';
 
-enum RegisterSubmitStatus {
-  initial,
-  inProgress,
-  success,
-  failure,
-}
-
 @CopyWith()
 class RegisterState extends Equatable {
-  final RegisterSubmitStatus submitStatus;
-  final String username;
-  final String password;
-  final String confirmPassword;
-  final bool isValidUsername;
-  final bool isValidPassword;
-  final bool isValidConfirmPassword;
+  final FormzStatus status;
+  final Username username;
+  final Password password;
+  final ConfirmPassword confirmPassword;
 
   const RegisterState({
-    this.submitStatus = RegisterSubmitStatus.initial,
-    this.username = '',
-    this.password = '',
-    this.confirmPassword = '',
-    this.isValidUsername = false,
-    this.isValidPassword = false,
-    this.isValidConfirmPassword = false,
+    this.status = FormzStatus.pure,
+    this.username = const Username.pure(),
+    this.password = const Password.pure(),
+    this.confirmPassword = const ConfirmPassword.pure(),
   });
 
   @override
   List<Object?> get props => [
-        submitStatus,
+        status,
         username,
         password,
         confirmPassword,
-        isValidUsername,
-        isValidPassword,
-        isValidConfirmPassword,
       ];
 }

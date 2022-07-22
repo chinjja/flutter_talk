@@ -2,7 +2,9 @@
 
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:formz/formz.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:talk/common/common.dart';
 import 'package:talk/pages/register/bloc/register_bloc.dart';
 import 'package:talk/repos/repos.dart';
 
@@ -28,7 +30,7 @@ void main() {
         build: () => bloc,
         act: (bloc) => bloc.add(RegisterUsernameChanged('user')),
         expect: () => [
-          RegisterState(username: 'user'),
+          RegisterState(username: Username.dirty('user')),
         ],
       );
     });
@@ -39,7 +41,7 @@ void main() {
         build: () => bloc,
         act: (bloc) => bloc.add(RegisterPasswordChanged('12')),
         expect: () => [
-          RegisterState(password: '12'),
+          RegisterState(password: Password.dirty('12')),
         ],
       );
     });
@@ -50,39 +52,37 @@ void main() {
         build: () => bloc,
         act: (bloc) => bloc.add(RegisterConfirmPasswordChanged('34')),
         expect: () => [
-          RegisterState(confirmPassword: '34'),
+          RegisterState(confirmPassword: ConfirmPassword.dirty('', '34')),
         ],
       );
     });
 
     group('RegisterSubmitted', () {
-      final state = RegisterState(
-        username: 'user',
-        password: '1234',
-        confirmPassword: '1234',
-      );
+      late RegisterState state;
+
+      setUp(() {
+        state = RegisterState(
+          username: Username.dirty('user@user.com'),
+          password: Password.dirty('1234'),
+          confirmPassword: ConfirmPassword.dirty('1234', '1234'),
+        );
+      });
       blocTest<RegisterBloc, RegisterState>(
         'emits [inProgress, success] when event is added.',
         build: () => bloc,
         setUp: () {
-          when(() =>
-                  authRepository.register(username: 'user', password: '1234'))
-              .thenAnswer((_) async => {});
+          when(() => authRepository.register(
+              username: 'user@user.com',
+              password: '1234')).thenAnswer((_) async => {});
         },
         seed: () => state,
         act: (bloc) => bloc.add(RegisterSubmitted()),
         expect: () => [
           state.copyWith(
-            isValidUsername: true,
-            isValidPassword: true,
-            isValidConfirmPassword: true,
-            submitStatus: RegisterSubmitStatus.inProgress,
+            status: FormzStatus.submissionInProgress,
           ),
           state.copyWith(
-            isValidUsername: true,
-            isValidPassword: true,
-            isValidConfirmPassword: true,
-            submitStatus: RegisterSubmitStatus.success,
+            status: FormzStatus.submissionSuccess,
           ),
         ],
       );
@@ -90,24 +90,18 @@ void main() {
         'emits [inProgress, failure] when event is added.',
         build: () => bloc,
         setUp: () {
-          when(() =>
-                  authRepository.register(username: 'user', password: '1234'))
-              .thenThrow(Exception('oops'));
+          when(() => authRepository.register(
+              username: 'user@user.com',
+              password: '1234')).thenThrow(Exception('oops'));
         },
         seed: () => state,
         act: (bloc) => bloc.add(RegisterSubmitted()),
         expect: () => [
           state.copyWith(
-            isValidUsername: true,
-            isValidPassword: true,
-            isValidConfirmPassword: true,
-            submitStatus: RegisterSubmitStatus.inProgress,
+            status: FormzStatus.submissionInProgress,
           ),
           state.copyWith(
-            isValidUsername: true,
-            isValidPassword: true,
-            isValidConfirmPassword: true,
-            submitStatus: RegisterSubmitStatus.failure,
+            status: FormzStatus.submissionFailure,
           ),
         ],
       );
@@ -115,13 +109,12 @@ void main() {
       blocTest<RegisterBloc, RegisterState>(
         'when username is invalid then emits error.',
         build: () => bloc,
-        seed: () => state.copyWith.username('use'),
+        seed: () => state.copyWith.username(Username.dirty('use')),
         act: (bloc) => bloc.add(RegisterSubmitted()),
         expect: () => [
           state.copyWith(
-            username: 'use',
-            isValidPassword: true,
-            isValidConfirmPassword: true,
+            status: FormzStatus.invalid,
+            username: Username.dirty('use'),
           ),
         ],
       );
@@ -129,12 +122,12 @@ void main() {
       blocTest<RegisterBloc, RegisterState>(
         'when password is invalid then emits error.',
         build: () => bloc,
-        seed: () => state.copyWith.password('123'),
+        seed: () => state.copyWith.password(Password.dirty('123')),
         act: (bloc) => bloc.add(RegisterSubmitted()),
         expect: () => [
           state.copyWith(
-            password: '123',
-            isValidUsername: true,
+            status: FormzStatus.invalid,
+            password: Password.dirty('123'),
           ),
         ],
       );
@@ -143,14 +136,13 @@ void main() {
         'when confrim password is invalid then emits error.',
         build: () => bloc,
         seed: () => state.copyWith(
-          confirmPassword: '123',
+          confirmPassword: ConfirmPassword.dirty('', '123'),
         ),
         act: (bloc) => bloc.add(RegisterSubmitted()),
         expect: () => [
           state.copyWith(
-            confirmPassword: '123',
-            isValidUsername: true,
-            isValidPassword: true,
+            status: FormzStatus.invalid,
+            confirmPassword: ConfirmPassword.dirty('', '123'),
           ),
         ],
       );

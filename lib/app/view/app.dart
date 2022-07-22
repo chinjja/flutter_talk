@@ -6,6 +6,7 @@ import 'package:talk/pages/chat/chat.dart';
 import 'package:talk/pages/chat_create/chat_create.dart';
 import 'package:talk/pages/home/home.dart';
 import 'package:talk/pages/login/login.dart';
+import 'package:talk/pages/register/register.dart';
 import 'package:talk/pages/verify_email/verify_email.dart';
 import 'package:talk/repos/repos.dart';
 
@@ -88,6 +89,13 @@ class _AppViewState extends State<AppView> {
         name: 'login',
         path: '/login',
         builder: (context, state) => const LoginPage(),
+        routes: [
+          GoRoute(
+            name: 'register',
+            path: 'register',
+            builder: (context, state) => const RegisterPage(),
+          )
+        ],
       ),
       GoRoute(
         name: 'verify-email',
@@ -111,6 +119,7 @@ class _AppViewState extends State<AppView> {
           }
           break;
         case AppStatus.unauthentication:
+          if (state.subloc == '/login/register') return null;
           if (state.subloc != '/login') {
             return '/login';
           }
