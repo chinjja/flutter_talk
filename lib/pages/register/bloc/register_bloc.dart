@@ -12,48 +12,28 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
   final AuthRepository authRepository;
   RegisterBloc(this.authRepository) : super(const RegisterState()) {
     on<RegisterUsernameChanged>((event, emit) {
-      if (event.username.length < 4) {
-        emit(state.copyWith(
-          username: event.username,
-          usernameError: 'username.length >= 4',
-        ));
-      } else {
-        emit(state.copyWith(
-          username: event.username,
-          usernameError: null,
-        ));
-      }
+      emit(state.copyWith.username(event.username));
     });
     on<RegisterPasswordChanged>((event, emit) {
-      if (event.password.length < 4) {
-        emit(state.copyWith(
-          password: event.password,
-          passwordError: 'password.length >= 4',
-        ));
-      } else {
-        emit(state.copyWith(
-          password: event.password,
-          passwordError: null,
-        ));
-      }
+      emit(state.copyWith.password(event.password));
     });
     on<RegisterConfirmPasswordChanged>((event, emit) {
-      if (event.confirmPassword != state.password) {
-        emit(state.copyWith(
-          confirmPassword: event.confirmPassword,
-          confirmPasswordError: 'invalid confirm password',
-        ));
-      } else {
-        emit(state.copyWith(
-          confirmPassword: event.confirmPassword,
-          confirmPasswordError: null,
-        ));
-      }
+      emit(state.copyWith.confirmPassword(event.confirmPassword));
     });
     on<RegisterSubmitted>((event, emit) async {
-      if (state.isValid) {
+      final isValidUsername = state.username.trim().length >= 4;
+      final isValidPassword = state.password.length >= 4;
+      final isValidConfirmPassword = state.password == state.confirmPassword;
+      final isValid =
+          isValidUsername && isValidPassword && isValidConfirmPassword;
+      if (isValid) {
         try {
-          emit(state.copyWith(submitStatus: RegisterSubmitStatus.inProgress));
+          emit(state.copyWith(
+            submitStatus: RegisterSubmitStatus.inProgress,
+            isValidUsername: true,
+            isValidPassword: true,
+            isValidConfirmPassword: true,
+          ));
           await authRepository.register(
             username: state.username,
             password: state.password,
@@ -62,6 +42,12 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
         } catch (_) {
           emit(state.copyWith(submitStatus: RegisterSubmitStatus.failure));
         }
+      } else {
+        emit(state.copyWith(
+          isValidUsername: isValidUsername,
+          isValidPassword: isValidPassword,
+          isValidConfirmPassword: isValidConfirmPassword,
+        ));
       }
     });
   }

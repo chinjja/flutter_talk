@@ -13,25 +13,18 @@ class RegisterState extends Equatable {
   final String username;
   final String password;
   final String confirmPassword;
-  final String? usernameError;
-  final String? passwordError;
-  final String? confirmPasswordError;
-  bool get isValid =>
-      username.isNotEmpty &&
-      usernameError == null &&
-      password.isNotEmpty &&
-      passwordError == null &&
-      confirmPassword.isNotEmpty &&
-      confirmPasswordError == null;
+  final bool isValidUsername;
+  final bool isValidPassword;
+  final bool isValidConfirmPassword;
 
   const RegisterState({
     this.submitStatus = RegisterSubmitStatus.initial,
     this.username = '',
     this.password = '',
     this.confirmPassword = '',
-    this.usernameError,
-    this.passwordError,
-    this.confirmPasswordError,
+    this.isValidUsername = false,
+    this.isValidPassword = false,
+    this.isValidConfirmPassword = false,
   });
 
   @override
@@ -40,8 +33,8 @@ class RegisterState extends Equatable {
         username,
         password,
         confirmPassword,
-        usernameError,
-        passwordError,
-        confirmPasswordError,
+        isValidUsername,
+        isValidPassword,
+        isValidConfirmPassword,
       ];
 }

@@ -83,7 +83,7 @@ class _UsernameTextField extends StatelessWidget {
           },
           decoration: InputDecoration(
             hintText: 'Username',
-            errorText: state.usernameError,
+            errorText: state.isValidUsername ? null : 'username invalid',
           ),
         );
       },
@@ -105,7 +105,7 @@ class _PasswordTextField extends StatelessWidget {
           },
           decoration: InputDecoration(
             hintText: 'Password',
-            errorText: state.passwordError,
+            errorText: state.isValidPassword ? null : 'password invalid',
           ),
         );
       },
@@ -129,7 +129,8 @@ class _ConfirmPasswordTextField extends StatelessWidget {
           },
           decoration: InputDecoration(
             hintText: 'Confirm Password',
-            errorText: state.confirmPasswordError,
+            errorText:
+                state.isValidConfirmPassword ? null : 'password do not match',
           ),
         );
       },
@@ -144,13 +145,15 @@ class _SubmitButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<RegisterBloc, RegisterState>(
       builder: (context, state) {
+        final inProgress =
+            state.submitStatus == RegisterSubmitStatus.inProgress;
         return ElevatedButton(
-          onPressed: state.isValid
-              ? () {
+          onPressed: inProgress
+              ? null
+              : () {
                   context.read<RegisterBloc>().add(const RegisterSubmitted());
-                }
-              : null,
-          child: state.submitStatus == RegisterSubmitStatus.inProgress
+                },
+          child: inProgress
               ? const CircularProgressIndicator()
               : const Text('Submit'),
         );
