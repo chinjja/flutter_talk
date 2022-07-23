@@ -111,7 +111,6 @@ void main() {
         final chat = Chat(id: 1, createdAt: DateTime.now());
         final msg = ChatMessage(
           id: 2,
-          chat: chat,
           sender: sender,
           message: 'greeting',
           instant: DateTime.now(),

@@ -23,8 +23,8 @@ void main() {
         final chat = Chat(id: 1, createdAt: DateTime.now());
         final user = User(username: 'user');
         final users = [
-          ChatUser(id: 2, chat: chat, user: user, readAt: DateTime.now()),
-          ChatUser(id: 3, chat: chat, user: user, readAt: DateTime.now()),
+          ChatUser(user: user, readAt: DateTime.now()),
+          ChatUser(user: user, readAt: DateTime.now()),
         ];
         when(() => dio.get('/chat-users', queryParameters: {'chatId': chat.id}))
             .thenAnswer(
@@ -34,30 +34,6 @@ void main() {
         );
 
         final res = await chatUserProvider.getChatUsers(chat: chat);
-        expect(res, users);
-      });
-
-      test('when chat and id list is passed then returns user that contains id',
-          () async {
-        final chat = Chat(id: 1, createdAt: DateTime.now());
-        final user = User(username: 'user');
-        final users = [
-          ChatUser(id: 2, chat: chat, user: user, readAt: DateTime.now()),
-          ChatUser(id: 3, chat: chat, user: user, readAt: DateTime.now()),
-        ];
-        when(() => dio.get('/chat-users', queryParameters: {
-              'chatId': chat.id,
-              'idList': [2, 3],
-            })).thenAnswer(
-          (_) async => FakeResponse(
-            data: users.map((e) => e.toJson()).toList(),
-          ),
-        );
-
-        final res = await chatUserProvider.getChatUsers(
-          chat: chat,
-          idList: [2, 3],
-        );
         expect(res, users);
       });
     });

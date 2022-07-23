@@ -66,7 +66,7 @@ class ChatUserListBloc extends Bloc<ChatUserListEvent, ChatUserListState> {
 
     on<ChatUserRemoved>((event, emit) {
       emit(state.copyWith(
-          users: state.users.where((e) => e.id != event.user.id).toList()));
+          users: state.users.where((e) => e.user != event.user.user).toList()));
     });
   }
 

@@ -90,10 +90,8 @@ void main() {
         when(() => authProvider.login(
               username: 'user',
               password: '1234',
-            )).thenAnswer((_) async => LoginResponse(
-              emailVerified: true,
-              token: token,
-            ));
+            )).thenAnswer((_) async => token);
+        when(() => authProvider.isVerified()).thenAnswer((_) async => true);
         when(() => tokenProvider.write(token)).thenAnswer((_) async => {});
 
         authRepository.login(

@@ -37,10 +37,7 @@ void main() {
         'username': 'user',
         'password': '1234',
       };
-      final res = LoginResponse(
-        emailVerified: true,
-        token: Token(accessToken: 'a', refreshToken: 'r'),
-      );
+      final res = Token(accessToken: 'a', refreshToken: 'r');
       when(() => dio.post('/auth/login', data: req)).thenAnswer((_) async {
         return FakeResponse(
           data: res.toJson(),

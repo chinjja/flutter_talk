@@ -40,10 +40,8 @@ void main() {
       group('getMessage()', () {
         test('when message id is passed then return message', () async {
           final sender = User(username: 'sender');
-          final chat = Chat(id: 1, createdAt: DateTime.now());
           final message = ChatMessage(
             id: 2,
-            chat: chat,
             sender: sender,
             message: 'greeting',
             instant: DateTime.now(),
@@ -68,7 +66,6 @@ void main() {
           final messages = [
             ChatMessage(
               id: 2,
-              chat: chat,
               sender: sender,
               message: 'greeting',
               instant: DateTime.now(),
@@ -99,7 +96,6 @@ void main() {
           final messages = [
             ChatMessage(
               id: 2,
-              chat: chat,
               sender: sender,
               message: 'greeting',
               instant: DateTime.now(),

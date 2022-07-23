@@ -20,7 +20,7 @@ class AuthProvider {
     );
   }
 
-  Future<LoginResponse> login({
+  Future<Token> login({
     required String username,
     required String password,
   }) async {
@@ -31,7 +31,7 @@ class AuthProvider {
         'password': password,
       },
     );
-    return LoginResponse.fromJson(res.data);
+    return Token.fromJson(res.data);
   }
 
   Future<void> logout() async {

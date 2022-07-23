@@ -6,15 +6,12 @@ class ChatUserProvider {
   final Dio _dio;
 
   ChatUserProvider(this._dio);
-  Future<List<ChatUser>> getChatUsers(
-      {required Chat chat, List<int>? idList}) async {
-    Map<String, dynamic> param = {'chatId': chat.id};
-    if (idList != null) {
-      param['idList'] = idList;
-    }
+  Future<List<ChatUser>> getChatUsers({required Chat chat}) async {
     final res = await _dio.get(
       '/chat-users',
-      queryParameters: param,
+      queryParameters: {
+        'chatId': chat.id,
+      },
     );
     final list = List.castFrom(res.data);
     return list.map((e) => ChatUser.fromJson(e)).toList();

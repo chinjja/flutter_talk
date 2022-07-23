@@ -21,22 +21,3 @@ class User extends Equatable {
   @override
   List<Object?> get props => [username];
 }
-
-@JsonSerializable(explicitToJson: true)
-@CopyWith()
-class LoginResponse extends Equatable {
-  final bool emailVerified;
-  final Token token;
-
-  const LoginResponse({
-    required this.emailVerified,
-    required this.token,
-  });
-
-  factory LoginResponse.fromJson(Map<String, dynamic> json) =>
-      _$LoginResponseFromJson(json);
-
-  Map<String, dynamic> toJson() => _$LoginResponseToJson(this);
-  @override
-  List<Object?> get props => [emailVerified, token];
-}

@@ -58,7 +58,7 @@ class ChatRepository {
           final old = await _joinedChatsChanged.first;
           if (event.isAdded) {
             final list = old.map((e) {
-              if (e.chat.id != message.chat.id) return e;
+              if (e.chat.id != event.chatId) return e;
               return e.copyWith(
                 info: e.info.copyWith(
                   latestMessage: message,
@@ -71,10 +71,9 @@ class ChatRepository {
           }
         }));
         _subscriptions.add(onChatUserChanged.listen((event) async {
-          final user = event.data;
           final old = await _joinedChatsChanged.first;
           final list = await Stream.fromIterable(old).asyncMap((e) async {
-            if (e.chat.id != user.chat.id) return e;
+            if (e.chat.id != event.chatId) return e;
             if (event.isAdded) {
               return e.copyWith(
                 info: e.info.copyWith(
@@ -182,9 +181,8 @@ class ChatRepository {
 
   Future<List<ChatUser>> getChatUsers({
     required Chat chat,
-    List<int>? idList,
   }) async {
-    return _chatUserProvider.getChatUsers(chat: chat, idList: idList);
+    return _chatUserProvider.getChatUsers(chat: chat);
   }
 
   Future<void> invite({required Chat chat, required List<User> users}) async {

@@ -48,15 +48,16 @@ class AuthRepository {
     required String username,
     required String password,
   }) async {
-    final res =
+    final token =
         await _authProvider.login(username: username, password: password);
-    var user = User(username: username);
+    final user = User(username: username);
     _user = user;
-    await _tokenProvider.write(res.token);
+    await _tokenProvider.write(token);
+    final verified = await _authProvider.isVerified();
 
     _authChanged.add(Authentication(
       principal: user,
-      emailVerified: res.emailVerified,
+      emailVerified: verified,
     ));
   }
 

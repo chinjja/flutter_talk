@@ -128,7 +128,6 @@ void main() {
             userCount: 10,
             unreadCount: 10,
             latestMessage: ChatMessage(
-              chat: chats[0],
               id: 1,
               instant: DateTime.now(),
               message: 'hello',

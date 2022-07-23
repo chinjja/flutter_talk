@@ -77,7 +77,11 @@ class ChatListenProvider {
         switch (data.objectType) {
           case 'Chat':
             final chat = Chat.fromJson(data.data);
-            _chatChanged.add(ChatChanged(command: data.command, data: chat));
+            _chatChanged.add(ChatChanged(
+              chatId: data.chatId,
+              command: data.command,
+              data: chat,
+            ));
             switch (data.command) {
               case 'added':
                 _listenChat(chat: chat);
@@ -89,8 +93,11 @@ class ChatListenProvider {
             break;
           case 'Friend':
             final friend = User.fromJson(data.data);
-            _friendChanged
-                .add(ChatChanged(command: data.command, data: friend));
+            _friendChanged.add(ChatChanged(
+              chatId: data.chatId,
+              command: data.command,
+              data: friend,
+            ));
             break;
         }
       },
@@ -123,6 +130,7 @@ class ChatListenProvider {
             case 'ChatUser':
               final chatUser = ChatUser.fromJson(data.data);
               _chatUserChanged.add(ChatChanged(
+                chatId: data.chatId,
                 command: data.command,
                 data: chatUser,
               ));
@@ -132,6 +140,7 @@ class ChatListenProvider {
               final chatUsers = list.map((e) => ChatUser.fromJson(e)).toList();
               for (final chatUser in chatUsers) {
                 _chatUserChanged.add(ChatChanged(
+                  chatId: data.chatId,
                   command: data.command,
                   data: chatUser,
                 ));
@@ -140,6 +149,7 @@ class ChatListenProvider {
             case 'ChatMessage':
               final message = ChatMessage.fromJson(data.data);
               _messageChanegd.add(ChatChanged(
+                chatId: data.chatId,
                 command: data.command,
                 data: message,
               ));

@@ -42,18 +42,17 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         _subscription.add(
           _chatRepository.onChatMessageChanged
               .where((e) => e.isAdded)
-              .map((e) => e.data)
-              .where((e) => e.chat.id == chat.id)
+              .where((e) => e.chatId == chat.id)
               .listen(
-            (message) {
-              add(ChatMessageReceived(message));
+            (event) {
+              add(ChatMessageReceived(event.data));
             },
           ),
         );
 
         _subscription.add(
           _chatRepository.onChatUserChanged
-              .where((e) => e.data.chat.id == chat.id)
+              .where((e) => e.chatId == chat.id)
               .listen(
             (data) {
               late List<ChatUser> chatUsers;
@@ -61,12 +60,12 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
                 chatUsers = [...state.chatUsers, data.data];
               } else if (data.isRemoved) {
                 chatUsers = [
-                  ...state.chatUsers.where((e) => e.id != data.data.id),
+                  ...state.chatUsers.where((e) => e.user != data.data.user),
                 ];
               } else if (data.isUpdated) {
                 chatUsers = [
                   ...state.chatUsers.map(
-                    (e) => e.id == data.data.id ? data.data : e,
+                    (e) => e.user == data.data.user ? data.data : e,
                   ),
                 ];
               } else {

@@ -9,14 +9,10 @@ part 'chat_user.g.dart';
 @JsonSerializable(explicitToJson: true)
 @CopyWith()
 class ChatUser extends Equatable {
-  final int id;
-  final Chat chat;
   final User user;
   final DateTime readAt;
 
   const ChatUser({
-    required this.id,
-    required this.chat,
     required this.user,
     required this.readAt,
   });
@@ -26,5 +22,5 @@ class ChatUser extends Equatable {
   Map<String, dynamic> toJson() => _$ChatUserToJson(this);
 
   @override
-  List<Object?> get props => [id, chat, user, readAt];
+  List<Object?> get props => [user, readAt];
 }

@@ -10,14 +10,12 @@ part 'chat_message.g.dart';
 @CopyWith()
 class ChatMessage extends Equatable {
   final int id;
-  final Chat chat;
   final User sender;
   final String message;
   final DateTime instant;
 
   const ChatMessage({
     required this.id,
-    required this.chat,
     required this.sender,
     required this.message,
     required this.instant,
@@ -28,5 +26,5 @@ class ChatMessage extends Equatable {
   Map<String, dynamic> toJson() => _$ChatMessageToJson(this);
 
   @override
-  List<Object?> get props => [id, chat, sender, message, instant];
+  List<Object?> get props => [id, sender, message, instant];
 }
