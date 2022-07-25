@@ -53,17 +53,37 @@ class VerifyEmailView extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: const [
+                _Header(),
+                SizedBox(height: 32),
                 _VerificationCodeTextField(),
                 _CountDown(),
-                SizedBox(height: 8),
                 _SendCodeButton(),
-                SizedBox(height: 8),
+                SizedBox(height: 32),
                 _VerifyButton(),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+class _Header extends StatelessWidget {
+  const _Header({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text('인증코드 확인.', style: Theme.of(context).textTheme.headline2),
+        const SizedBox(height: 12),
+        Text(
+          '이메일로 발송된 인증코드를 입력하세요.',
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
+      ],
     );
   }
 }
@@ -122,7 +142,15 @@ class _SendCodeButton extends StatelessWidget {
                 },
           child: Stack(
             children: [
-              state.sendCode ? const Text('다시 받기') : const Text('코드 받기'),
+              state.sendCode
+                  ? Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Text('다시 받기'),
+                        Icon(Icons.refresh),
+                      ],
+                    )
+                  : const Text('코드 받기'),
               if (state.sendStatus == FetchStatus.loading)
                 const _SamllIndicator(),
             ],
