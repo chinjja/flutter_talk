@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:go_router/go_router.dart';
+import 'package:talk/pages/reset_password/view/reset_password_page.dart';
 import 'package:talk/repos/repos.dart';
 
 import '../login.dart';
@@ -52,6 +53,8 @@ class LoginView extends StatelessWidget {
                 _SubmitButton(),
                 SizedBox(height: 8),
                 _RegisterButton(),
+                SizedBox(height: 8),
+                _ResetPasswordButton(),
               ],
             ),
           ),
@@ -143,6 +146,25 @@ class _RegisterButton extends StatelessWidget {
           child: const Text('Register'),
         );
       },
+    );
+  }
+}
+
+class _ResetPasswordButton extends StatelessWidget {
+  const _ResetPasswordButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () async {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return const ResetPasswordPage();
+          },
+        );
+      },
+      child: const Text('Reset Password'),
     );
   }
 }

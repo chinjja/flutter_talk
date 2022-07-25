@@ -164,5 +164,15 @@ void main() {
         verify(() => authProvider.verifyCode("1234")).called(1);
       });
     });
+
+    group('sendResetPassword()', () {
+      test('when email is passed then shoudl success', () async {
+        when(() => authProvider.sendResetPassword('user@user.com'))
+            .thenAnswer((_) => Future.value());
+
+        await authRepository.sendResetPassword('user@user.com');
+        verify(() => authProvider.sendResetPassword('user@user.com')).called(1);
+      });
+    });
   });
 }

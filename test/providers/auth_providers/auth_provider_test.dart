@@ -97,5 +97,16 @@ void main() {
       verify(() => dio.get('/verification/is-verified')).called(1);
       verifyNoMoreInteractions(dio);
     });
+
+    test('send reset password email', () async {
+      when(() => dio.post('/auth/reset/user@user.com')).thenAnswer((_) async {
+        return FakeResponse();
+      });
+
+      await authProvider.sendResetPassword('user@user.com');
+
+      verify(() => dio.post('/auth/reset/user@user.com')).called(1);
+      verifyNoMoreInteractions(dio);
+    });
   });
 }

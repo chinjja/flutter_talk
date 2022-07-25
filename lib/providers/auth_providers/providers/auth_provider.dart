@@ -52,4 +52,8 @@ class AuthProvider {
     final res = await _dio.get('/verification/is-verified');
     return res.data;
   }
+
+  Future<void> sendResetPassword(String email) async {
+    await _dio.post('/auth/reset/$email');
+  }
 }

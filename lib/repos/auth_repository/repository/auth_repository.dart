@@ -95,4 +95,8 @@ class AuthRepository {
   Future<bool> isVerified() async {
     return await _authProvider.isVerified();
   }
+
+  Future<void> sendResetPassword(String email) async {
+    await _authProvider.sendResetPassword(email);
+  }
 }
