@@ -12,6 +12,8 @@ class LoginState extends Equatable {
     this.password = const Password.pure(),
   });
 
+  bool get isValid => username.valid && password.valid;
+
   @override
   List<Object?> get props => [
         status,

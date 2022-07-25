@@ -24,10 +24,7 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
           ConfirmPassword.dirty(state.password.value, event.confirmPassword)));
     });
     on<RegisterSubmitted>((event, emit) async {
-      final isValid = state.username.valid &&
-          state.password.valid &&
-          state.confirmPassword.valid;
-      if (!isValid) {
+      if (!state.isValid) {
         emit(state.copyWith(status: FormzStatus.invalid));
         return;
       }

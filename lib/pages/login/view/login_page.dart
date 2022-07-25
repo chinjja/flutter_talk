@@ -118,14 +118,14 @@ class _SubmitButton extends StatelessWidget {
     return BlocBuilder<LoginBloc, LoginState>(
       builder: (context, state) {
         return ElevatedButton(
-          onPressed: state.status.isInvalid
+          onPressed: state.status.isSubmissionInProgress || !state.isValid
               ? null
               : () {
                   context.read<LoginBloc>().add(const LoginSubmitted());
                 },
           child: state.status.isSubmissionInProgress
               ? const CircularProgressIndicator()
-              : const Text('Submit'),
+              : const Text('Login'),
         );
       },
     );

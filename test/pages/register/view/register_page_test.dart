@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:formz/formz.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:talk/common/common.dart';
 import 'package:talk/pages/register/register.dart';
 
 import '../../../mocks/mocks.dart';
@@ -50,7 +51,22 @@ void main() {
             .called(1);
       });
 
-      testWidgets('RegisterSubmitted when submit is pressed', (tester) async {
+      testWidgets('whenAnyFieldIsInvalid_thenPressingSubmitShouldNothing',
+          (tester) async {
+        await tester.pumpApp(bloc);
+
+        await tester.tap(find.byKey(submitKey));
+
+        verifyNever(() => bloc.add(RegisterSubmitted()));
+      });
+
+      testWidgets('whenAllFieldIsValid_thenPressingSubmitShouldEmit',
+          (tester) async {
+        when(() => bloc.state).thenReturn(RegisterState(
+          username: Username.dirty('user@user.com'),
+          password: Password.dirty('1234'),
+          confirmPassword: ConfirmPassword.dirty('1234', '1234'),
+        ));
         await tester.pumpApp(bloc);
 
         await tester.tap(find.byKey(submitKey));
@@ -74,8 +90,7 @@ void main() {
         expect(confirm.decoration?.errorText, isNull);
       });
 
-      testWidgets(
-          'when submitStatus is inProgress then submit button is disabled',
+      testWidgets('when status is inProgress then submit button is disabled',
           (tester) async {
         when(() => bloc.state).thenReturn(RegisterState(
           status: FormzStatus.submissionInProgress,
@@ -87,13 +102,12 @@ void main() {
         expect(find.byType(CircularProgressIndicator), findsOneWidget);
       });
 
-      testWidgets(
-          'when submitStatus is not inProgress then submit button is enabled',
+      testWidgets('when status is pure then submit button is disabled',
           (tester) async {
         await tester.pumpApp(bloc);
 
         final button = tester.widget(find.byKey(submitKey)) as ElevatedButton;
-        expect(button.enabled, true);
+        expect(button.enabled, false);
         expect(find.byType(CircularProgressIndicator), findsNothing);
       });
     });

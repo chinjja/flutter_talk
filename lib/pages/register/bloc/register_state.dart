@@ -14,6 +14,8 @@ class RegisterState extends Equatable {
     this.confirmPassword = const ConfirmPassword.pure(),
   });
 
+  bool get isValid => username.valid && password.valid && confirmPassword.valid;
+
   @override
   List<Object?> get props => [
         status,

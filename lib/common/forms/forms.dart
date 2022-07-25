@@ -12,7 +12,7 @@ class Username extends FormzInput<String, bool> {
     final idx2 = value.indexOf('.', idx);
     if (idx2 == -1) return false;
 
-    if (value.length < 4) return false;
+    if (value.length <= idx2 + 1) return false;
     return null;
   }
 }

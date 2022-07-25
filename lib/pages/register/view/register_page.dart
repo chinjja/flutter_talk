@@ -151,14 +151,14 @@ class _SubmitButton extends StatelessWidget {
       builder: (context, state) {
         return ElevatedButton(
           key: const Key('registerPage_submit_button'),
-          onPressed: state.status.isInvalid
+          onPressed: state.status.isSubmissionInProgress || !state.isValid
               ? null
               : () {
                   context.read<RegisterBloc>().add(const RegisterSubmitted());
                 },
           child: state.status.isSubmissionInProgress
               ? const CircularProgressIndicator()
-              : const Text('Submit'),
+              : const Text('Register'),
         );
       },
     );

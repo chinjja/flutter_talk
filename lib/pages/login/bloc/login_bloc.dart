@@ -20,8 +20,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       emit(state.copyWith.password(Password.dirty(event.password)));
     });
     on<LoginSubmitted>((event, emit) async {
-      final isValid = state.username.valid && state.password.valid;
-      if (!isValid) {
+      if (!state.isValid) {
         emit(state.copyWith(status: FormzStatus.invalid));
         return;
       }
