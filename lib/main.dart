@@ -8,7 +8,7 @@ import 'app/app.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final dio = Dio(BaseOptions(baseUrl: 'http://localhost:8080'));
+  final dio = Dio(BaseOptions(baseUrl: 'http://chinjja.iptime.org'));
   final authProvider = AuthProvider(dio);
   final tokenProvider = TokenProvider();
   final userProvider = UserProvider(dio);
