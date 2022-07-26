@@ -11,10 +11,12 @@ void main() async {
   final dio = Dio(BaseOptions(baseUrl: 'http://localhost:8080'));
   final authProvider = AuthProvider(dio);
   final tokenProvider = TokenProvider();
+  final userProvider = UserProvider(dio);
   final authRepository = AuthRepository(
     authProvider,
     tokenProvider,
   );
+  final userRepository = UserRepository(userProvider);
 
   final chatProvider = ChatProvider(dio);
   final chatUserProvider = ChatUserProvider(dio);
@@ -82,6 +84,7 @@ void main() async {
 
   runApp(
     App(
+      userRepository: userRepository,
       authRepository: authRepository,
       chatRepository: chatRepository,
     ),

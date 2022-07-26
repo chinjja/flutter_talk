@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:talk/app/app.dart';
 import 'package:talk/repos/repos.dart';
 
@@ -215,67 +216,8 @@ class FriendTile extends StatelessWidget {
       leading: const CircleAvatar(child: Icon(Icons.person)),
       title: Text(user.username),
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => UserDetailsView(user: user),
-            fullscreenDialog: true,
-          ),
-        );
+        context.go('/home/profile/${Uri.encodeComponent(user.username)}');
       },
-    );
-  }
-}
-
-class UserDetailsView extends StatelessWidget {
-  final User user;
-  const UserDetailsView({Key? key, required this.user}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        actions: const [
-          IconButton(
-            icon: Icon(Icons.money),
-            onPressed: null,
-          ),
-          IconButton(
-            icon: Icon(Icons.star),
-            onPressed: null,
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            const CircleAvatar(
-              radius: 32,
-              child: Icon(
-                Icons.person,
-                size: 48,
-              ),
-            ),
-            Text(user.username),
-            const SizedBox(height: 8),
-            const Divider(),
-            const SizedBox(height: 8),
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              _tap(Icons.sms, '1:1 채팅'),
-              _tap(Icons.call, '통화하기'),
-            ])
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _tap(IconData icon, String label) {
-    return TextButton.icon(
-      icon: Icon(icon),
-      label: Text(label),
-      onPressed: null,
     );
   }
 }

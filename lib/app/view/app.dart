@@ -2,20 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:talk/app/app.dart';
-import 'package:talk/pages/chat/chat.dart';
-import 'package:talk/pages/chat_create/chat_create.dart';
-import 'package:talk/pages/home/home.dart';
-import 'package:talk/pages/login/login.dart';
-import 'package:talk/pages/register/register.dart';
-import 'package:talk/pages/verify_email/verify_email.dart';
+import 'package:talk/pages/pages.dart';
+import 'package:talk/pages/profile/view/profile_page.dart';
 import 'package:talk/repos/repos.dart';
 
 class App extends StatelessWidget {
+  final UserRepository userRepository;
   final AuthRepository authRepository;
   final ChatRepository chatRepository;
 
   const App({
     Key? key,
+    required this.userRepository,
     required this.authRepository,
     required this.chatRepository,
   }) : super(key: key);
@@ -24,6 +22,9 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
+        RepositoryProvider.value(
+          value: userRepository,
+        ),
         RepositoryProvider.value(
           value: authRepository,
         ),
@@ -55,7 +56,7 @@ class _AppViewState extends State<AppView> {
     routes: [
       GoRoute(
         name: 'home',
-        path: '/:tab(home|chat|profile)',
+        path: '/:tab(home|chat|settings)',
         builder: (context, state) {
           final tab = state.params['tab'];
           final idx = tab == 'home'
@@ -78,6 +79,14 @@ class _AppViewState extends State<AppView> {
               return ChatPage(chatId: int.parse(state.params['chatId']!));
             },
           ),
+          GoRoute(
+            name: 'profile',
+            path: 'profile/:username',
+            builder: (context, state) {
+              var username = Uri.decodeComponent(state.params['username']!);
+              return ProfilePage(username: username);
+            },
+          )
         ],
       ),
       GoRoute(

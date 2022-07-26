@@ -31,6 +31,7 @@ void main() {
     group('renders', () {
       testWidgets('when authentication is emitted then show AppView',
           (tester) async {
+        final userRepository = MockUserRepository();
         final authRepository = MockAuthRepository();
         final chatRepository = MockChatRepository();
         when(() => authRepository.onAuthChanged).thenAnswer(
@@ -44,6 +45,7 @@ void main() {
           ]),
         );
         await tester.pumpWidget(App(
+          userRepository: userRepository,
           authRepository: authRepository,
           chatRepository: chatRepository,
         ));
