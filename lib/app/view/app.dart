@@ -124,7 +124,7 @@ class _AppViewState extends State<AppView> {
           if (state.subloc == '/login' ||
               state.subloc == '/splash' ||
               state.subloc == '/verify-email') {
-            return '/home';
+            return '/';
           }
           break;
         case AppStatus.unauthentication:
@@ -138,6 +138,9 @@ class _AppViewState extends State<AppView> {
             return '/verify-email';
           }
           break;
+      }
+      if (state.subloc == '/') {
+        return '/home';
       }
       return null;
     },
