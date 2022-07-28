@@ -3,7 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:talk/app/app.dart';
-import 'package:talk/pages/register/register.dart';
+import 'package:talk/pages/pages.dart';
 import 'package:talk/repos/repos.dart';
 
 class MockAuthRepository extends Mock implements AuthRepository {}
@@ -38,3 +38,6 @@ class MockAppBloc extends MockBloc<AppEvent, AppState> implements AppBloc {}
 
 class MockRegisterBloc extends MockBloc<RegisterEvent, RegisterState>
     implements RegisterBloc {}
+
+class MockProfileEditBloc extends MockBloc<ProfileEditEvent, ProfileEditState>
+    implements ProfileEditBloc {}

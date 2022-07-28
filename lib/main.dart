@@ -16,7 +16,9 @@ void main() async {
     authProvider,
     tokenProvider,
   );
+  final storageProvider = StorageProvider(dio);
   final userRepository = UserRepository(userProvider);
+  final storageRepository = StorageRepository(storageProvider);
 
   final chatProvider = ChatProvider(dio);
   final chatUserProvider = ChatUserProvider(dio);
@@ -87,6 +89,7 @@ void main() async {
       userRepository: userRepository,
       authRepository: authRepository,
       chatRepository: chatRepository,
+      storageRepository: storageRepository,
     ),
   );
 }

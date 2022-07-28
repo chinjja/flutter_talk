@@ -34,6 +34,7 @@ void main() {
         final userRepository = MockUserRepository();
         final authRepository = MockAuthRepository();
         final chatRepository = MockChatRepository();
+        final storageRepository = MockStorageRepository();
         when(() => authRepository.onAuthChanged).thenAnswer(
           (_) => Stream.fromIterable([
             Authentication(
@@ -48,6 +49,7 @@ void main() {
           userRepository: userRepository,
           authRepository: authRepository,
           chatRepository: chatRepository,
+          storageRepository: storageRepository,
         ));
         expect(find.byType(AppView), findsOneWidget);
       });

@@ -10,18 +10,23 @@ class App extends StatelessWidget {
   final UserRepository userRepository;
   final AuthRepository authRepository;
   final ChatRepository chatRepository;
+  final StorageRepository storageRepository;
 
   const App({
     Key? key,
     required this.userRepository,
     required this.authRepository,
     required this.chatRepository,
+    required this.storageRepository,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
+        RepositoryProvider.value(
+          value: storageRepository,
+        ),
         RepositoryProvider.value(
           value: userRepository,
         ),
@@ -83,11 +88,20 @@ class _AppViewState extends State<AppView> {
             name: 'profile',
             path: 'profile/:username',
             builder: (context, state) {
-              var username = Uri.decodeComponent(state.params['username']!);
-              return ProfilePage(username: username);
+              return ProfilePage(username: state.params['username']!);
             },
-          )
+          ),
         ],
+      ),
+      GoRoute(
+        name: 'profile-edit',
+        path: '/profile-edit',
+        pageBuilder: (context, state) {
+          return MaterialPage(
+            fullscreenDialog: true,
+            child: ProfileEditPage(user: state.extra as User),
+          );
+        },
       ),
       GoRoute(
         name: 'splash',

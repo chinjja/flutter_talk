@@ -6,6 +6,7 @@ export 'friend_list/friend_list.dart';
 export 'home/home.dart';
 export 'login/login.dart';
 export 'profile/profile.dart';
+export 'profile_edit/profile_edit.dart';
 export 'register/register.dart';
 export 'reset_password/reset_password.dart';
 export 'settings/settings.dart';

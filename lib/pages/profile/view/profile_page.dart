@@ -2,6 +2,8 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:talk/app/app.dart';
 import 'package:talk/repos/repos.dart';
 
 import '../profile.dart';
@@ -26,6 +28,7 @@ class ProfileView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.select((AppBloc bloc) => bloc.state.user);
     return BlocBuilder<ProfileBloc, ProfileState>(
       builder: (context, state) {
         bool hasPhoto = state.user?.photoId != null;
@@ -71,7 +74,11 @@ class ProfileView extends StatelessWidget {
                   const SizedBox(height: 8),
                   Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                     _tap(Icons.sms, '1:1 채팅'),
-                    _tap(Icons.call, '통화하기'),
+                    if (state.user == auth)
+                      _tap(Icons.edit, '프로필 편집', () {
+                        context.pushNamed('profile-edit', extra: state.user!);
+                      }),
+                    if (state.user != auth) _tap(Icons.call, '통화하기'),
                   ])
                 ],
               ),
@@ -82,11 +89,11 @@ class ProfileView extends StatelessWidget {
     );
   }
 
-  Widget _tap(IconData icon, String label) {
+  Widget _tap(IconData icon, String label, [VoidCallback? onPressed]) {
     return TextButton.icon(
       icon: Icon(icon),
       label: Text(label),
-      onPressed: null,
+      onPressed: onPressed,
     );
   }
 }
