@@ -73,11 +73,6 @@ class _AppViewState extends State<AppView> {
         },
         routes: [
           GoRoute(
-            name: 'new-chat',
-            path: 'new-chat',
-            builder: (context, state) => const ChatCreatePage(),
-          ),
-          GoRoute(
             name: 'chats',
             path: 'chats/:chatId',
             builder: (context, state) {
@@ -92,6 +87,15 @@ class _AppViewState extends State<AppView> {
             },
           ),
         ],
+      ),
+      GoRoute(
+        path: '/new-chat',
+        pageBuilder: (context, state) {
+          return const MaterialPage(
+            fullscreenDialog: true,
+            child: ChatCreatePage(),
+          );
+        },
       ),
       GoRoute(
         name: 'profile-edit',
@@ -112,18 +116,33 @@ class _AppViewState extends State<AppView> {
         name: 'login',
         path: '/login',
         builder: (context, state) => const LoginPage(),
-        routes: [
-          GoRoute(
-            name: 'register',
-            path: 'register',
-            builder: (context, state) => const RegisterPage(),
-          )
-        ],
       ),
       GoRoute(
-        name: 'verify-email',
+        path: '/register',
+        pageBuilder: (context, state) {
+          return const MaterialPage(
+            fullscreenDialog: true,
+            child: RegisterPage(),
+          );
+        },
+      ),
+      GoRoute(
         path: '/verify-email',
-        builder: (context, state) => const VerifyEmailPage(),
+        pageBuilder: (context, state) {
+          return const MaterialPage(
+            fullscreenDialog: true,
+            child: VerifyEmailPage(),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/reset-password',
+        pageBuilder: (context, state) {
+          return const MaterialPage(
+            fullscreenDialog: true,
+            child: ResetPasswordPage(),
+          );
+        },
       ),
     ],
     redirect: (state) {
@@ -142,7 +161,8 @@ class _AppViewState extends State<AppView> {
           }
           break;
         case AppStatus.unauthentication:
-          if (state.subloc == '/login/register') return null;
+          if (state.subloc == '/register') return null;
+          if (state.subloc == '/reset-password') return null;
           if (state.subloc != '/login') {
             return '/login';
           }

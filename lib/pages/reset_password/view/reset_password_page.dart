@@ -23,42 +23,18 @@ class ResetPasswordView extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocConsumer<ResetPasswordBloc, ResetPasswordState>(
       builder: (context, state) {
-        return AlertDialog(
-          title: const Text('Reset Password'),
-          content: TextField(
-            autofocus: true,
-            onChanged: (value) => context
-                .read<ResetPasswordBloc>()
-                .add(ResetPasswordEamilChanged(value)),
-            decoration: InputDecoration(
-              hintText: 'Enter Email',
-              errorText: state.email.invalid ? 'invalid email' : null,
+        return Scaffold(
+          appBar: AppBar(title: const Text('Reset Password')),
+          body: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              children: const [
+                _EmailField(),
+                SizedBox(height: 10),
+                _SubmitButton(),
+              ],
             ),
           ),
-          actions: [
-            ElevatedButton(
-              onPressed: state.status.isSubmissionInProgress || !state.isValid
-                  ? null
-                  : () {
-                      context
-                          .read<ResetPasswordBloc>()
-                          .add(const ResetPasswordSubmitted());
-                    },
-              child: Stack(
-                children: [
-                  const Text('Send to Email'),
-                  if (state.status.isSubmissionInProgress)
-                    const _SamllIndicator(),
-                ],
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Cancel'),
-            ),
-          ],
         );
       },
       listenWhen: (previous, current) => previous.status != current.status,
@@ -75,6 +51,55 @@ class ResetPasswordView extends StatelessWidget {
             ..showSnackBar(
                 const SnackBar(content: Text('Reset Password Failed')));
         }
+      },
+    );
+  }
+}
+
+class _EmailField extends StatelessWidget {
+  const _EmailField({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ResetPasswordBloc, ResetPasswordState>(
+      builder: (context, state) {
+        return TextField(
+          autofocus: true,
+          onChanged: (value) => context
+              .read<ResetPasswordBloc>()
+              .add(ResetPasswordEamilChanged(value)),
+          decoration: InputDecoration(
+            labelText: 'Enter Email',
+            errorText: state.email.invalid ? 'invalid email' : null,
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _SubmitButton extends StatelessWidget {
+  const _SubmitButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ResetPasswordBloc, ResetPasswordState>(
+      builder: (context, state) {
+        return ElevatedButton(
+          onPressed: state.status.isSubmissionInProgress || !state.isValid
+              ? null
+              : () {
+                  context
+                      .read<ResetPasswordBloc>()
+                      .add(const ResetPasswordSubmitted());
+                },
+          child: Stack(
+            children: [
+              const Text('Send to Email'),
+              if (state.status.isSubmissionInProgress) const _SamllIndicator(),
+            ],
+          ),
+        );
       },
     );
   }

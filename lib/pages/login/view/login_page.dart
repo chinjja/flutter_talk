@@ -141,7 +141,7 @@ class _RegisterButton extends StatelessWidget {
       builder: (context, state) {
         return ElevatedButton(
           onPressed: () {
-            context.go('/login/register');
+            context.push('/register');
           },
           child: const Text('Register'),
         );
@@ -156,13 +156,8 @@ class _ResetPasswordButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () async {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return const ResetPasswordPage();
-          },
-        );
+      onPressed: () {
+        context.push('/reset-password');
       },
       child: const Text('Reset Password'),
     );

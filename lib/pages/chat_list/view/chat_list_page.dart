@@ -33,7 +33,7 @@ class ChatListView extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () {
-              context.go('/chat/new-chat');
+              context.push('/new-chat');
             },
           )
         ],
