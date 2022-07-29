@@ -9,17 +9,23 @@ import '../../mocks/mocks.dart';
 void main() {
   group('AuthRepository', () {
     const token = Token(accessToken: 'a', refreshToken: 'b');
-    const authentication =
-        Authentication(principal: User(username: "user"), emailVerified: true);
+    const user = User(username: "user");
+    const authentication = Authentication(principal: user, emailVerified: true);
 
     late AuthProvider authProvider;
     late TokenProvider tokenProvider;
+    late UserProvider userProvider;
     late AuthRepository authRepository;
 
     setUp(() {
       authProvider = MockAuthProvider();
       tokenProvider = MockTokenProvider();
-      authRepository = AuthRepository(authProvider, tokenProvider);
+      userProvider = MockUserProvider();
+      authRepository = AuthRepository(
+        authProvider,
+        tokenProvider,
+        userProvider,
+      );
     });
 
     group('init()', () {
@@ -54,6 +60,8 @@ void main() {
         when(() => tokenProvider.decode(token.accessToken))
             .thenReturn({'sub': 'user'});
         when(() => authProvider.isVerified()).thenAnswer((_) async => true);
+        when(() => userProvider.get(username: 'user'))
+            .thenAnswer((_) async => user);
 
         authRepository.init();
 

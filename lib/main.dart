@@ -15,6 +15,7 @@ void main() async {
   final authRepository = AuthRepository(
     authProvider,
     tokenProvider,
+    userProvider,
   );
   final storageProvider = StorageProvider(dio);
   final userRepository = UserRepository(userProvider);

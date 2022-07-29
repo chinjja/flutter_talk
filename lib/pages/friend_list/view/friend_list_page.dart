@@ -135,7 +135,7 @@ class SliverUserView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.select((AppBloc bloc) => bloc.state.user);
+    final user = context.auth;
     return SliverToBoxAdapter(
       child: user == null ? const SizedBox() : FriendTile(user: user),
     );

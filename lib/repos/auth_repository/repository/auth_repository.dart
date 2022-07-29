@@ -1,5 +1,7 @@
 import 'dart:developer';
 
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:talk/providers/providers.dart';
 
@@ -99,4 +101,13 @@ class AuthRepository {
   Future<void> sendResetPassword(String email) async {
     await _authProvider.sendResetPassword(email);
   }
+}
+
+extension IsAuthContext on BuildContext {
+  bool isAuth(User? user) {
+    return user != null &&
+        user.username == read<AuthRepository>().user?.username;
+  }
+
+  User? get auth => read<AuthRepository>().user;
 }

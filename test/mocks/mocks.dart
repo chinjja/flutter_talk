@@ -18,6 +18,8 @@ class MockAuthProvider extends Mock implements AuthProvider {}
 
 class MockTokenProvider extends Mock implements TokenProvider {}
 
+class MockUserProvider extends Mock implements UserProvider {}
+
 class MockChatProvider extends Mock implements ChatProvider {}
 
 class MockChatUserProvider extends Mock implements ChatUserProvider {}
