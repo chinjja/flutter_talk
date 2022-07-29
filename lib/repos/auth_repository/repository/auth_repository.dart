@@ -11,9 +11,10 @@ class AuthRepository {
   final _authChanged = BehaviorSubject<Authentication?>();
   final AuthProvider _authProvider;
   final TokenProvider _tokenProvider;
+  final UserProvider _userProvider;
   User? _user;
 
-  AuthRepository(this._authProvider, this._tokenProvider);
+  AuthRepository(this._authProvider, this._tokenProvider, this._userProvider);
 
   Stream<Authentication?> get onAuthChanged => _authChanged;
   User? get user => _user;
@@ -24,7 +25,8 @@ class AuthRepository {
       if (data != null && !_tokenProvider.isExpired(data.refreshToken)) {
         final verified = await isVerified();
         final map = _tokenProvider.decode(data.accessToken);
-        var user = User(username: map['sub']);
+        var username = map['sub'];
+        final user = await _userProvider.get(username: username);
         _user = user;
         _authChanged.add(Authentication(
           principal: user,
