@@ -151,8 +151,8 @@ void main() {
       group('fetchFriends()', () {
         test('when fetch then emit item', () async {
           final friends = [
-            User(username: 'a'),
-            User(username: 'b'),
+            Friend(user: User(username: 'a')),
+            Friend(user: User(username: 'b')),
           ];
           when(() => friendProvider.getFriends())
               .thenAnswer((_) async => friends);

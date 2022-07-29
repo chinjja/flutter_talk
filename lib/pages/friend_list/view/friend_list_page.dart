@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:talk/app/app.dart';
 import 'package:talk/repos/repos.dart';
 
 import '../friend_list.dart';
@@ -193,7 +192,7 @@ class SliverFriendListView extends StatelessWidget {
           delegate: SliverChildBuilderDelegate(
             (context, index) {
               final friend = state.friends[index];
-              return FriendTile(user: friend);
+              return FriendTile(user: friend.user);
             },
             childCount: state.friends.length,
           ),
@@ -214,7 +213,17 @@ class FriendTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: const CircleAvatar(child: Icon(Icons.person)),
-      title: Text(user.username),
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(user.name ?? user.username),
+          if (user.state != null)
+            Text(
+              user.state ?? '',
+              style: const TextStyle(fontSize: 10),
+            ),
+        ],
+      ),
       onTap: () {
         context.go('/home/profile/${Uri.encodeComponent(user.username)}');
       },

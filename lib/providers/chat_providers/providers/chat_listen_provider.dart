@@ -16,7 +16,7 @@ class ChatListenProvider {
   StompClient? _client;
 
   final _chatChanged = PublishSubject<ChatChanged<Chat>>();
-  final _friendChanged = PublishSubject<ChatChanged<User>>();
+  final _friendChanged = PublishSubject<ChatChanged<Friend>>();
 
   final _messageChanegd = PublishSubject<ChatChanged<ChatMessage>>();
   final _chatUserChanged = PublishSubject<ChatChanged<ChatUser>>();
@@ -26,7 +26,7 @@ class ChatListenProvider {
   ChatListenProvider(this._dio, this._chatProvider);
 
   Stream<ChatChanged<Chat>> get onChatChanged => _chatChanged.stream;
-  Stream<ChatChanged<User>> get onFriendChanged => _friendChanged.stream;
+  Stream<ChatChanged<Friend>> get onFriendChanged => _friendChanged.stream;
   Stream<ChatChanged<ChatMessage>> get onChatMessageChanged =>
       _messageChanegd.stream;
   Stream<ChatChanged<ChatUser>> get onChatUserChanged =>
@@ -92,7 +92,7 @@ class ChatListenProvider {
             }
             break;
           case 'Friend':
-            final friend = User.fromJson(data.data);
+            final friend = Friend.fromJson(data.data);
             _friendChanged.add(ChatChanged(
               chatId: data.chatId,
               command: data.command,

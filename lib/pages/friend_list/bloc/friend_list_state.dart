@@ -11,7 +11,7 @@ enum FriendListStatus {
 class FriendListState extends Equatable {
   final FriendListStatus status;
   final FriendListStatus addStatus;
-  final List<User> friends;
+  final List<Friend> friends;
   const FriendListState({
     this.status = FriendListStatus.initial,
     this.addStatus = FriendListStatus.initial,

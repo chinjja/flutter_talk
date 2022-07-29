@@ -57,19 +57,19 @@ class _AddMemberTile extends StatelessWidget {
     return ListTile(
       onTap: () async {
         final bloc = context.read<ChatUserListBloc>();
-        final data = await Navigator.push(
+        await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => BlocProvider.value(
               value: bloc,
-              child: const _FriendSelectionView(),
+              child: RepositoryProvider.value(
+                value: bloc,
+                child: const _FriendSelectionView(),
+              ),
             ),
             fullscreenDialog: true,
           ),
         );
-        if (data != null) {
-          bloc.add(ChatUserListInvited(data));
-        }
       },
       leading: const CircleAvatar(child: Icon(Icons.add)),
       title: const Text('대화상대 초대'),
@@ -121,7 +121,7 @@ class _FriendSelectionView extends StatefulWidget {
 
 class __FriendSelectionViewState extends State<_FriendSelectionView> {
   final _checked = <String>{};
-  List<User>? friends;
+  List<Friend>? friends;
 
   @override
   void initState() {
@@ -143,11 +143,14 @@ class __FriendSelectionViewState extends State<_FriendSelectionView> {
             onPressed: _checked.isEmpty
                 ? null
                 : () {
-                    Navigator.pop(
-                        context,
-                        friends!
-                            .where((e) => _checked.contains(e.username))
-                            .toList());
+                    final users = friends!
+                        .where((e) => _checked.contains(e.user.username))
+                        .map((e) => e.user)
+                        .toList();
+                    context
+                        .read<ChatUserListBloc>()
+                        .add(ChatUserListInvited(users));
+                    Navigator.pop(context);
                   },
             icon: const Icon(Icons.done),
           ),
@@ -163,17 +166,18 @@ class __FriendSelectionViewState extends State<_FriendSelectionView> {
                   itemCount: friends!.length,
                   itemBuilder: (context, index) {
                     final friend = friends![index];
+                    final username = friend.user.username;
                     return CheckboxListTile(
-                      title: Text(friend.username),
-                      value: _checked.contains(friend.username),
-                      onChanged: alreadyChecked.contains(friend.username)
+                      title: Text(username),
+                      value: _checked.contains(username),
+                      onChanged: alreadyChecked.contains(username)
                           ? null
                           : (value) {
                               setState(() {
                                 if (value ?? false) {
-                                  _checked.add(friend.username);
+                                  _checked.add(username);
                                 } else {
-                                  _checked.remove(friend.username);
+                                  _checked.remove(username);
                                 }
                               });
                             },

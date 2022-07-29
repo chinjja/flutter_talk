@@ -11,7 +11,7 @@ class ChatRepository {
   final ChatListenProvider _chatListenProvider;
 
   final _joinedChatsChanged = BehaviorSubject<List<ChatItem>>();
-  final _friendsChanged = BehaviorSubject<List<User>>();
+  final _friendsChanged = BehaviorSubject<List<Friend>>();
 
   final _subscriptions = CompositeSubscription();
 
@@ -49,8 +49,9 @@ class ChatRepository {
           if (event.isAdded) {
             _friendsChanged.add([...old, friend]);
           } else if (event.isRemoved) {
-            _friendsChanged
-                .add(old.where((e) => e.username != friend.username).toList());
+            _friendsChanged.add(old
+                .where((e) => e.user.username != friend.user.username)
+                .toList());
           }
         }));
         _subscriptions.add(onChatMessageChanged.listen((event) async {
@@ -197,7 +198,7 @@ class ChatRepository {
     await _chatUserProvider.leave(chat: chat);
   }
 
-  Future<List<User>> getFriends() async {
+  Future<List<Friend>> getFriends() async {
     return _friendProvider.getFriends();
   }
 

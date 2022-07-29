@@ -21,8 +21,8 @@ void main() {
     group('getFriends()', () {
       test('return all friends', () async {
         final friends = [
-          User(username: 'a'),
-          User(username: 'b'),
+          Friend(user: User(username: 'a')),
+          Friend(user: User(username: 'b')),
         ];
         when(() => dio.get('/friends')).thenAnswer((_) async =>
             FakeResponse(data: friends.map((e) => e.toJson()).toList()));
@@ -34,7 +34,7 @@ void main() {
 
     group('getFriend()', () {
       test('return friend by username', () async {
-        final friend = User(username: 'user');
+        final friend = Friend(user: User(username: 'user'));
 
         when(() => dio.get('/friends/user'))
             .thenAnswer((_) async => FakeResponse(data: friend.toJson()));

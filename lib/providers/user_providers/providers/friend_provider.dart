@@ -7,15 +7,15 @@ class FriendProvider {
 
   FriendProvider(this._dio);
 
-  Future<List<User>> getFriends() async {
+  Future<List<Friend>> getFriends() async {
     final res = await _dio.get('/friends');
     final list = List.castFrom(res.data);
-    return list.map((e) => User.fromJson(e)).toList();
+    return list.map((e) => Friend.fromJson(e)).toList();
   }
 
-  Future<User> getFriend(String username) async {
+  Future<Friend> getFriend(String username) async {
     final res = await _dio.get('/friends/$username');
-    return User.fromJson(res.data);
+    return Friend.fromJson(res.data);
   }
 
   Future<void> addFriend({

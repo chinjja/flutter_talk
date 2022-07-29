@@ -21,7 +21,7 @@ class FriendAdded extends FriendListEvent {
 }
 
 class FriendRemoved extends FriendListEvent {
-  final User friend;
+  final Friend friend;
 
   const FriendRemoved(this.friend);
 
