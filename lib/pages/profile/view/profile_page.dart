@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:talk/app/app.dart';
 import 'package:talk/repos/repos.dart';
 
 import '../profile.dart';
@@ -28,7 +27,6 @@ class ProfileView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final auth = context.select((AppBloc bloc) => bloc.state.user);
     return BlocBuilder<ProfileBloc, ProfileState>(
       builder: (context, state) {
         bool hasPhoto = state.user?.photoId != null;
@@ -60,31 +58,86 @@ class ProfileView extends StatelessWidget {
             body: SafeArea(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  const CircleAvatar(
-                    radius: 32,
-                    child: Icon(
-                      Icons.person,
-                      size: 48,
-                    ),
-                  ),
-                  Text(state.user?.username ?? '???'),
-                  const SizedBox(height: 8),
-                  const Divider(),
-                  const SizedBox(height: 8),
-                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    _tap(Icons.sms, '1:1 채팅'),
-                    if (state.user == auth)
-                      _tap(Icons.edit, '프로필 편집', () {
-                        context.pushNamed('profile-edit', extra: state.user!);
-                      }),
-                    if (state.user != auth) _tap(Icons.call, '통화하기'),
-                  ])
+                children: const [
+                  _ProfilePhoto(),
+                  _NameText(),
+                  SizedBox(height: 8),
+                  _StateText(),
+                  SizedBox(height: 8),
+                  Divider(),
+                  SizedBox(height: 8),
+                  _BottomActions(),
                 ],
               ),
             ),
           ),
         );
+      },
+    );
+  }
+}
+
+class _ProfilePhoto extends StatelessWidget {
+  const _ProfilePhoto({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 96,
+      height: 96,
+      child: BlocBuilder<ProfileBloc, ProfileState>(
+        builder: (context, state) {
+          return const CircleAvatar();
+        },
+      ),
+    );
+  }
+}
+
+class _NameText extends StatelessWidget {
+  const _NameText({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ProfileBloc, ProfileState>(
+      builder: (context, state) {
+        final user = state.user;
+        return Text(user?.name ?? user?.username ?? '');
+      },
+    );
+  }
+}
+
+class _StateText extends StatelessWidget {
+  const _StateText({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ProfileBloc, ProfileState>(
+      builder: (context, state) {
+        final user = state.user;
+        return Text(user?.state ?? '');
+      },
+    );
+  }
+}
+
+class _BottomActions extends StatelessWidget {
+  const _BottomActions({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ProfileBloc, ProfileState>(
+      builder: (context, state) {
+        final isAuth = context.isAuth(state.user);
+        return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          _tap(Icons.sms, '1:1 채팅'),
+          if (isAuth)
+            _tap(Icons.edit, '프로필 편집', () {
+              context.pushNamed('profile-edit', extra: state.user!);
+            }),
+          if (!isAuth) _tap(Icons.call, '통화하기'),
+        ]);
       },
     );
   }
