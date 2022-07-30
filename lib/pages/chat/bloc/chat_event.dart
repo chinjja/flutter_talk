@@ -55,3 +55,7 @@ class ChatUsersChanged extends ChatEvent {
   @override
   List<Object> get props => [chatUsers];
 }
+
+class ChatRemoved extends ChatEvent {
+  const ChatRemoved();
+}

@@ -17,6 +17,7 @@ class ChatState extends Equatable {
   final User? user;
   final String message;
   final bool hasNextMessage;
+  final bool removed;
 
   bool get isValid => message.trim().isNotEmpty;
 
@@ -29,6 +30,7 @@ class ChatState extends Equatable {
     this.user,
     this.message = '',
     this.hasNextMessage = false,
+    this.removed = false,
   });
 
   @override
@@ -41,5 +43,6 @@ class ChatState extends Equatable {
         user,
         message,
         hasNextMessage,
+        removed,
       ];
 }

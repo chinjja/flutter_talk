@@ -30,7 +30,30 @@ class ChatPage extends StatelessWidget {
                   listenRepository: listenRepo,
                 )),
       ],
-      child: const ChatView(),
+      child: BlocListener<ChatBloc, ChatState>(
+        listenWhen: (previous, current) => previous.removed != current.removed,
+        listener: (context, state) {
+          if (state.removed) {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  content: const Text('이 방은 삭제되었습니다.'),
+                  actions: [
+                    TextButton(
+                      child: const Text('나가기'),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                );
+              },
+            );
+          }
+        },
+        child: const ChatView(),
+      ),
     );
   }
 }
