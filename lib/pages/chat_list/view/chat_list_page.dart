@@ -86,7 +86,23 @@ class _ChatTile extends StatelessWidget {
         motion: const DrawerMotion(),
         children: [
           SlidableAction(
-            onPressed: (context) {
+            onPressed: (context) async {
+              if (chatItem.chat.owner == context.auth) {
+                await showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        content: const Text('방 소유자는 떠날 수 없습니다.'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('닫기'),
+                          ),
+                        ],
+                      );
+                    });
+                return;
+              }
               context.read<ChatListBloc>().add(ChatListLeaved(chatItem.chat));
             },
             backgroundColor: Colors.deepOrange,

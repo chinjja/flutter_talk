@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:talk/common/common.dart';
 import 'package:talk/pages/chat_user_list/bloc/chat_user_list_bloc.dart';
@@ -32,7 +33,32 @@ class ChatPage extends StatelessWidget {
                   listenRepository: listenRepo,
                 )),
       ],
-      child: const ChatView(),
+      child: BlocListener<ChatBloc, ChatState>(
+        listenWhen: (previous, current) => previous.removed != current.removed,
+        listener: (context, state) async {
+          if (state.removed) {
+            await showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  content: const Text('이 방은 삭제되었습니다.'),
+                  actions: [
+                    TextButton(
+                      child: const Text('나가기'),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                );
+              },
+            );
+            // ignore: use_build_context_synchronously
+            context.pop();
+          }
+        },
+        child: const ChatView(),
+      ),
     );
   }
 }

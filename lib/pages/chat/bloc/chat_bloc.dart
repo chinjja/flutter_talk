@@ -27,59 +27,73 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         super(const ChatState()) {
     on<ChatStarted>((event, emit) async {
       if (state.chat == null) {
-        final chat = await _chatRepository.getChat(event.chatId);
-        emit(state.copyWith(
-          fetchStatus: FetchStatus.loading,
-          chat: chat,
-          user: event.user,
-        ));
-        await _chatRepository.read(chat: chat);
-        final messages =
-            await _chatRepository.getMessages(chat: chat, limit: 50);
-        final chatUsers = await _chatRepository.getChatUsers(chat: chat);
-        emit(state.copyWith(
-          fetchStatus: FetchStatus.success,
-          messages: messages,
-          chatUsers: chatUsers,
-          hasNextMessage: messages.length == 50,
-        ));
+        try {
+          final chat = await _chatRepository.getChat(event.chatId);
+          emit(state.copyWith(
+            fetchStatus: FetchStatus.loading,
+            chat: chat,
+            user: event.user,
+          ));
+          await _chatRepository.read(chat: chat);
+          final messages =
+              await _chatRepository.getMessages(chat: chat, limit: 50);
+          final chatUsers = await _chatRepository.getChatUsers(chat: chat);
+          emit(state.copyWith(
+            fetchStatus: FetchStatus.success,
+            messages: messages,
+            chatUsers: chatUsers,
+            hasNextMessage: messages.length == 50,
+          ));
 
-        _subscription.add(
-          _listenRepository.subscribeToChatMessage(
-            chat,
-            (event) {
-              if (event.isAdded) {
-                add(ChatMessageReceived(event.message));
-              }
-            },
-          ),
-        );
+          _subscription.add(
+            _listenRepository.subscribeToChat(
+              (event) {
+                if (event.chat.id == state.chat?.id && event.isRemoved) {
+                  add(const ChatRemoved());
+                }
+              },
+            ),
+          );
 
-        _subscription.add(
-          _listenRepository.subscribeToChatUser(
-            chat,
-            (data) {
-              final chatUser = data.chatUser;
-              late List<ChatUser> chatUsers;
-              if (data.isAdded) {
-                chatUsers = [...state.chatUsers, chatUser];
-              } else if (data.isRemoved) {
-                chatUsers = [
-                  ...state.chatUsers.where((e) => e.user != chatUser.user),
-                ];
-              } else if (data.isUpdated) {
-                chatUsers = [
-                  ...state.chatUsers.map(
-                    (e) => e.user == chatUser.user ? chatUser : e,
-                  ),
-                ];
-              } else {
-                return;
-              }
-              add(ChatUsersChanged(chatUsers));
-            },
-          ),
-        );
+          _subscription.add(
+            _listenRepository.subscribeToChatMessage(
+              chat,
+              (event) {
+                if (event.isAdded) {
+                  add(ChatMessageReceived(event.message));
+                }
+              },
+            ),
+          );
+
+          _subscription.add(
+            _listenRepository.subscribeToChatUser(
+              chat,
+              (data) {
+                final chatUser = data.chatUser;
+                late List<ChatUser> chatUsers;
+                if (data.isAdded) {
+                  chatUsers = [...state.chatUsers, chatUser];
+                } else if (data.isRemoved) {
+                  chatUsers = [
+                    ...state.chatUsers.where((e) => e.user != chatUser.user),
+                  ];
+                } else if (data.isUpdated) {
+                  chatUsers = [
+                    ...state.chatUsers.map(
+                      (e) => e.user == chatUser.user ? chatUser : e,
+                    ),
+                  ];
+                } else {
+                  return;
+                }
+                add(ChatUsersChanged(chatUsers));
+              },
+            ),
+          );
+        } catch (_) {
+          add(const ChatRemoved());
+        }
       }
     });
 
@@ -150,6 +164,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
     on<ChatUsersChanged>((event, emit) {
       emit(state.copyWith(chatUsers: event.chatUsers));
+    });
+
+    on<ChatRemoved>((event, emit) {
+      emit(state.copyWith.removed(true));
     });
   }
 

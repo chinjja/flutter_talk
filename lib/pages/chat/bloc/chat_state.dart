@@ -18,6 +18,7 @@ class ChatState extends Equatable {
   final String message;
   final bool hasNextMessage;
   final dynamic error;
+  final bool removed;
 
   bool get isValid => message.trim().isNotEmpty;
 
@@ -31,6 +32,7 @@ class ChatState extends Equatable {
     this.message = '',
     this.hasNextMessage = false,
     this.error,
+    this.removed = false,
   });
 
   @override
@@ -44,5 +46,6 @@ class ChatState extends Equatable {
         message,
         hasNextMessage,
         error,
+        removed,
       ];
 }
