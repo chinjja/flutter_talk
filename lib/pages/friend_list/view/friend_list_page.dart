@@ -12,7 +12,7 @@ class FriendListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) =>
-          FriendListBloc(chatRepository: context.read<ChatRepository>())
+          FriendListBloc(chatRepository: context.read<FriendRepository>())
             ..add(const FriendListInited()),
       child: const FriendListView(),
     );

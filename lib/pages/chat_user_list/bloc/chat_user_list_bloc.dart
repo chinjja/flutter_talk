@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:equatable/equatable.dart';
-import 'package:rxdart/rxdart.dart';
 import 'package:talk/common/common.dart';
 import 'package:talk/repos/repos.dart';
 
@@ -13,10 +12,13 @@ part 'chat_user_list_state.dart';
 part 'chat_user_list_bloc.g.dart';
 
 class ChatUserListBloc extends Bloc<ChatUserListEvent, ChatUserListState> {
-  final ChatRepository _chatRepository;
-  final _subscription = CompositeSubscription();
+  final ChatRepository chatRepository;
+  final ListenRepository listenRepository;
+  final _subscription = <Unsubscribe>[];
 
-  ChatUserListBloc(this._chatRepository) : super(const ChatUserListState()) {
+  ChatUserListBloc(
+      {required this.chatRepository, required this.listenRepository})
+      : super(const ChatUserListState()) {
     on<ChatUserListStarted>((event, emit) async {
       if (state.status != FetchStatus.initial) return;
       emit(state.copyWith(
@@ -24,14 +26,15 @@ class ChatUserListBloc extends Bloc<ChatUserListEvent, ChatUserListState> {
         chat: event.chat,
       ));
 
-      final data = await _chatRepository.getChatUsers(chat: event.chat);
+      final data = await chatRepository.getChatUsers(chat: event.chat);
       emit(state.copyWith(
         status: FetchStatus.success,
         users: data,
       ));
 
-      _subscription.add(_chatRepository.onChatUserChanged.listen((event) {
-        final chatUser = event.data;
+      _subscription
+          .add(listenRepository.subscribeToChatUser(state.chat!, (event) {
+        final chatUser = event.chatUser;
         if (event.isAdded) {
           add(ChatUserAdded(chatUser));
         } else if (event.isRemoved) {
@@ -46,7 +49,7 @@ class ChatUserListBloc extends Bloc<ChatUserListEvent, ChatUserListState> {
       try {
         emit(state.copyWith(
           status: FetchStatus.success,
-          users: await _chatRepository.getChatUsers(chat: chat),
+          users: await chatRepository.getChatUsers(chat: chat),
         ));
       } catch (_) {
         emit(state.copyWith(status: FetchStatus.failure));
@@ -56,7 +59,7 @@ class ChatUserListBloc extends Bloc<ChatUserListEvent, ChatUserListState> {
     on<ChatUserListInvited>((event, emit) async {
       final chat = state.chat;
       if (chat != null) {
-        await _chatRepository.invite(chat: chat, users: event.users);
+        await chatRepository.invite(chat: chat, users: event.users);
       }
     });
 
@@ -72,7 +75,10 @@ class ChatUserListBloc extends Bloc<ChatUserListEvent, ChatUserListState> {
 
   @override
   Future<void> close() {
-    _subscription.dispose();
+    for (final un in _subscription) {
+      un();
+    }
+    _subscription.clear();
     return super.close();
   }
 }

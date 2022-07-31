@@ -9,16 +9,16 @@ part 'friend_list_state.dart';
 part 'friend_list_bloc.g.dart';
 
 class FriendListBloc extends Bloc<FriendListEvent, FriendListState> {
-  final ChatRepository _chatRepository;
-  FriendListBloc({required ChatRepository chatRepository})
-      : _chatRepository = chatRepository,
+  final FriendRepository _friendRepository;
+  FriendListBloc({required FriendRepository chatRepository})
+      : _friendRepository = chatRepository,
         super(const FriendListState()) {
     on<FriendListInited>((event, emit) async {
       if (state.status == FriendListStatus.initial) {}
       emit(state.copyWith(status: FriendListStatus.loading));
-      _chatRepository.fetchFriends();
+      _friendRepository.fetchFriends();
       await emit.forEach(
-        _chatRepository.onFriends,
+        _friendRepository.onFriends,
         onData: (List<Friend> friends) {
           return state.copyWith(
             status: FriendListStatus.success,
@@ -32,7 +32,7 @@ class FriendListBloc extends Bloc<FriendListEvent, FriendListState> {
     on<FriendAdded>((event, emit) async {
       emit(state.copyWith(addStatus: FriendListStatus.loading));
       try {
-        await _chatRepository.addFriend(username: event.username);
+        await _friendRepository.addFriend(username: event.username);
       } catch (_) {
         emit(state.copyWith(addStatus: FriendListStatus.failure));
       }

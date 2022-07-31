@@ -32,9 +32,11 @@ void main() {
       testWidgets('when authentication is emitted then show AppView',
           (tester) async {
         final userRepository = MockUserRepository();
+        final friendRepository = MockFriendRepository();
         final authRepository = MockAuthRepository();
         final chatRepository = MockChatRepository();
         final storageRepository = MockStorageRepository();
+        final listenRepository = MockListenRepository();
         when(() => authRepository.onAuthChanged).thenAnswer(
           (_) => Stream.fromIterable([
             Authentication(
@@ -47,9 +49,11 @@ void main() {
         );
         await tester.pumpWidget(App(
           userRepository: userRepository,
+          friendRepository: friendRepository,
           authRepository: authRepository,
           chatRepository: chatRepository,
           storageRepository: storageRepository,
+          listenRepository: listenRepository,
         ));
         expect(find.byType(AppView), findsOneWidget);
       });

@@ -5,19 +5,24 @@ import 'package:talk/app/app.dart';
 import 'package:talk/pages/pages.dart';
 import 'package:talk/pages/profile/view/profile_page.dart';
 import 'package:talk/repos/repos.dart';
+import 'package:talk/repos/user_repository/repository/friend_repository.dart';
 
 class App extends StatelessWidget {
   final UserRepository userRepository;
+  final FriendRepository friendRepository;
   final AuthRepository authRepository;
   final ChatRepository chatRepository;
   final StorageRepository storageRepository;
+  final ListenRepository listenRepository;
 
   const App({
     Key? key,
     required this.userRepository,
+    required this.friendRepository,
     required this.authRepository,
     required this.chatRepository,
     required this.storageRepository,
+    required this.listenRepository,
   }) : super(key: key);
 
   @override
@@ -31,10 +36,16 @@ class App extends StatelessWidget {
           value: userRepository,
         ),
         RepositoryProvider.value(
+          value: friendRepository,
+        ),
+        RepositoryProvider.value(
           value: authRepository,
         ),
         RepositoryProvider.value(
           value: chatRepository,
+        ),
+        RepositoryProvider.value(
+          value: listenRepository,
         ),
       ],
       child: BlocProvider(

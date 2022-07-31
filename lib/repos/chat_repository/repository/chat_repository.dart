@@ -3,109 +3,109 @@ import 'package:rxdart/rxdart.dart';
 import '../../repos.dart';
 
 class ChatRepository {
-  final AuthRepository _authRepository;
   final ChatProvider _chatProvider;
   final ChatUserProvider _chatUserProvider;
   final ChatMessageProvider _chatMessageProvider;
-  final FriendProvider _friendProvider;
-  final ChatListenProvider _chatListenProvider;
+  final ListenRepository _listenRepository;
 
   final _joinedChatsChanged = BehaviorSubject<List<ChatItem>>();
-  final _friendsChanged = BehaviorSubject<List<Friend>>();
 
-  final _subscriptions = CompositeSubscription();
+  final _chatUnsubscribe = <int, List<Unsubscribe>>{};
 
   ChatRepository(
-    this._authRepository,
     this._chatProvider,
     this._chatUserProvider,
     this._chatMessageProvider,
-    this._friendProvider,
-    this._chatListenProvider,
+    this._listenRepository,
   ) {
-    _authRepository.onAuthChanged.listen((auth) {
-      if (auth == null) {
-        _chatListenProvider.deactivate();
-        _subscriptions.clear();
-      } else if (auth.emailVerified) {
-        fetchFriends();
-        fetchJoinedChats();
-        _chatListenProvider.activate(auth.principal);
+    _listenRepository.onConnectedUser.listen((user) async {
+      if (user == null) {
+        _unlistenChatAll();
+      } else {
+        final chats = await getJoinedChats();
+        _joinedChatsChanged.add(chats);
 
-        _subscriptions.add(onChatChanged.listen((event) async {
-          final chat = event.data;
+        for (final chat in chats) {
+          _listenChat(chat.chat);
+        }
+        _listenRepository.subscribeToChat((event) async {
+          final chat = event.chat;
           final old = await _joinedChatsChanged.first;
           if (event.isAdded) {
+            _listenChat(chat);
             final chatItem = await _bindChat(chat);
             _joinedChatsChanged.add([chatItem, ...old]);
           } else if (event.isRemoved) {
+            _unlistenChat(chat);
             _joinedChatsChanged
                 .add(old.where((e) => e.chat.id != chat.id).toList());
           }
-        }));
-        _subscriptions.add(onFriendChanged.listen((event) async {
-          final friend = event.data;
-          final old = await _friendsChanged.first;
-          if (event.isAdded) {
-            _friendsChanged.add([...old, friend]);
-          } else if (event.isRemoved) {
-            _friendsChanged.add(old
-                .where((e) => e.user.username != friend.user.username)
-                .toList());
-          }
-        }));
-        _subscriptions.add(onChatMessageChanged.listen((event) async {
-          final message = event.data;
-          final old = await _joinedChatsChanged.first;
-          if (event.isAdded) {
-            final list = old.map((e) {
-              if (e.chat.id != event.chatId) return e;
-              return e.copyWith(
-                info: e.info.copyWith(
-                  latestMessage: message,
-                  unreadCount: e.info.unreadCount + 1,
-                ),
-              );
-            }).toList();
-            list.sort();
-            _joinedChatsChanged.add(list);
-          }
-        }));
-        _subscriptions.add(onChatUserChanged.listen((event) async {
-          final old = await _joinedChatsChanged.first;
-          final list = await Stream.fromIterable(old).asyncMap((e) async {
-            if (e.chat.id != event.chatId) return e;
-            if (event.isAdded) {
-              return e.copyWith(
-                info: e.info.copyWith(
-                  userCount: e.info.userCount + 1,
-                ),
-              );
-            } else if (event.isRemoved) {
-              return e.copyWith(
-                info: e.info.copyWith(
-                  userCount: e.info.userCount - 1,
-                ),
-              );
-            } else if (event.isUpdated) {
-              return await _bindChat(e.chat);
-            } else {
-              return e;
-            }
-          }).toList();
-          _joinedChatsChanged.add(list);
-        }));
+        });
       }
     });
   }
 
-  late final onJoinedChats = _joinedChatsChanged.stream;
-  late final onFriends = _friendsChanged.stream;
+  void _unlistenChatAll() {
+    for (final un in _chatUnsubscribe.values) {
+      un.map((e) => e.call());
+    }
+    _chatUnsubscribe.clear();
+  }
 
-  late final onChatChanged = _chatListenProvider.onChatChanged;
-  late final onFriendChanged = _chatListenProvider.onFriendChanged;
-  late final onChatMessageChanged = _chatListenProvider.onChatMessageChanged;
-  late final onChatUserChanged = _chatListenProvider.onChatUserChanged;
+  void _unlistenChat(Chat chat) {
+    _chatUnsubscribe[chat.id]?.map((e) => e.call());
+    _chatUnsubscribe.remove(chat.id);
+  }
+
+  void _listenChat(Chat chat) {
+    final subs = <Unsubscribe>[];
+
+    subs.add(_listenRepository.subscribeToChatMessage(chat, (event) async {
+      final message = event.message;
+      final old = await _joinedChatsChanged.first;
+      if (event.isAdded) {
+        final list = old.map((e) {
+          if (e.chat.id != chat.id) return e;
+          return e.copyWith(
+            info: e.info.copyWith(
+              latestMessage: message,
+              unreadCount: e.info.unreadCount + 1,
+            ),
+          );
+        }).toList();
+        list.sort();
+        _joinedChatsChanged.add(list);
+      }
+    }));
+    subs.add(_listenRepository.subscribeToChatUser(chat, (event) async {
+      final old = await _joinedChatsChanged.first;
+      final list = await Stream.fromIterable(old).asyncMap((e) async {
+        if (e.chat.id != chat.id) return e;
+        if (event.isAdded) {
+          return e.copyWith(
+            info: e.info.copyWith(
+              userCount: e.info.userCount + 1,
+            ),
+          );
+        } else if (event.isRemoved) {
+          return e.copyWith(
+            info: e.info.copyWith(
+              userCount: e.info.userCount - 1,
+            ),
+          );
+        } else if (event.isUpdated) {
+          return await _bindChat(e.chat);
+        } else {
+          return e;
+        }
+      }).toList();
+      _joinedChatsChanged.add(list);
+    }));
+
+    _chatUnsubscribe[chat.id] = subs;
+  }
+
+  late final onJoinedChats = _joinedChatsChanged.stream;
 
   Future<void> read({required Chat chat}) async {
     await _chatProvider.read(chat: chat);
@@ -115,12 +115,17 @@ class ChatRepository {
     return await _chatProvider.getChats(type: type);
   }
 
-  Future<void> fetchJoinedChats() async {
+  Future<List<ChatItem>> getJoinedChats() async {
     final chats = await getChats(type: ChatType.join);
     final list = await Stream.fromIterable(chats)
         .asyncMap((event) => _bindChat(event))
         .toList();
     list.sort();
+    return list;
+  }
+
+  Future<void> fetchJoinedChats() async {
+    final list = await getJoinedChats();
     _joinedChatsChanged.add(list);
   }
 
@@ -196,26 +201,5 @@ class ChatRepository {
 
   Future<void> leave({required Chat chat}) async {
     await _chatUserProvider.leave(chat: chat);
-  }
-
-  Future<List<Friend>> getFriends() async {
-    return _friendProvider.getFriends();
-  }
-
-  Future<void> fetchFriends() async {
-    final friends = await getFriends();
-    _friendsChanged.add(friends);
-  }
-
-  Future<void> addFriend({
-    required String username,
-  }) async {
-    await _friendProvider.addFriend(username: username);
-  }
-
-  Future<void> removeFriend({
-    required User friend,
-  }) async {
-    await _friendProvider.removeFriend(friend: friend);
   }
 }

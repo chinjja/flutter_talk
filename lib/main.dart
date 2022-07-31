@@ -8,32 +8,39 @@ import 'app/app.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final dio = Dio(BaseOptions(baseUrl: 'http://chinjja.iptime.org'));
+  final dio = Dio(
+    BaseOptions(
+      baseUrl: const String.fromEnvironment(
+        'host.url',
+        defaultValue: 'http://localhost:8080',
+      ),
+    ),
+  );
+  final listenProvider = ListenProvider('${dio.options.baseUrl}/websocket');
   final authProvider = AuthProvider(dio);
   final tokenProvider = TokenProvider();
   final userProvider = UserProvider(dio);
+  final storageProvider = StorageProvider(dio);
+  final chatProvider = ChatProvider(dio);
+  final chatUserProvider = ChatUserProvider(dio);
+  final chatMessageProvider = ChatMessageProvider(dio);
+  final friendProvider = FriendProvider(dio);
+
   final authRepository = AuthRepository(
     authProvider,
     tokenProvider,
     userProvider,
   );
-  final storageProvider = StorageProvider(dio);
+  final listenRepository = ListenRepository(authRepository, listenProvider);
   final userRepository = UserRepository(userProvider);
   final storageRepository = StorageRepository(storageProvider);
-
-  final chatProvider = ChatProvider(dio);
-  final chatUserProvider = ChatUserProvider(dio);
-  final chatMessageProvider = ChatMessageProvider(dio);
-  final chatListenProvider = ChatListenProvider(dio, chatProvider);
-  final friendProvider = FriendProvider(dio);
   final chatRepository = ChatRepository(
-    authRepository,
     chatProvider,
     chatUserProvider,
     chatMessageProvider,
-    friendProvider,
-    chatListenProvider,
+    listenRepository,
   );
+  final friendRepository = FriendRepository(friendProvider, listenRepository);
 
   Future<bool> _refresh() async {
     final token = await tokenProvider.read();
@@ -88,9 +95,11 @@ void main() async {
   runApp(
     App(
       userRepository: userRepository,
+      friendRepository: friendRepository,
       authRepository: authRepository,
       chatRepository: chatRepository,
       storageRepository: storageRepository,
+      listenRepository: listenRepository,
     ),
   );
 }

@@ -14,11 +14,14 @@ part 'chat_bloc.g.dart';
 
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final ChatRepository _chatRepository;
-  final _subscription = CompositeSubscription();
+  final ListenRepository _listenRepository;
+  final _subscription = <Unsubscribe>[];
 
   ChatBloc({
     required ChatRepository chatRepository,
+    required ListenRepository listenRepository,
   })  : _chatRepository = chatRepository,
+        _listenRepository = listenRepository,
         super(const ChatState()) {
     on<ChatStarted>((event, emit) async {
       if (state.chat == null) {
@@ -40,32 +43,32 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         ));
 
         _subscription.add(
-          _chatRepository.onChatMessageChanged
-              .where((e) => e.isAdded)
-              .where((e) => e.chatId == chat.id)
-              .listen(
+          _listenRepository.subscribeToChatMessage(
+            chat,
             (event) {
-              add(ChatMessageReceived(event.data));
+              if (event.isAdded) {
+                add(ChatMessageReceived(event.message));
+              }
             },
           ),
         );
 
         _subscription.add(
-          _chatRepository.onChatUserChanged
-              .where((e) => e.chatId == chat.id)
-              .listen(
+          _listenRepository.subscribeToChatUser(
+            chat,
             (data) {
+              final chatUser = data.chatUser;
               late List<ChatUser> chatUsers;
               if (data.isAdded) {
-                chatUsers = [...state.chatUsers, data.data];
+                chatUsers = [...state.chatUsers, chatUser];
               } else if (data.isRemoved) {
                 chatUsers = [
-                  ...state.chatUsers.where((e) => e.user != data.data.user),
+                  ...state.chatUsers.where((e) => e.user != chatUser.user),
                 ];
               } else if (data.isUpdated) {
                 chatUsers = [
                   ...state.chatUsers.map(
-                    (e) => e.user == data.data.user ? data.data : e,
+                    (e) => e.user == chatUser.user ? chatUser : e,
                   ),
                 ];
               } else {
@@ -144,7 +147,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   @override
   Future<void> close() {
-    _subscription.dispose();
+    for (final un in _subscription) {
+      un();
+    }
+    _subscription.clear();
     return super.close();
   }
 }

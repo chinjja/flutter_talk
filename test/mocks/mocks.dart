@@ -14,6 +14,10 @@ class MockStorageRepository extends Mock implements StorageRepository {}
 
 class MockUserRepository extends Mock implements UserRepository {}
 
+class MockFriendRepository extends Mock implements FriendRepository {}
+
+class MockListenRepository extends Mock implements ListenRepository {}
+
 class MockAuthProvider extends Mock implements AuthProvider {}
 
 class MockTokenProvider extends Mock implements TokenProvider {}
@@ -27,8 +31,6 @@ class MockChatUserProvider extends Mock implements ChatUserProvider {}
 class MockChatMessageProvider extends Mock implements ChatMessageProvider {}
 
 class MockFriendProvider extends Mock implements FriendProvider {}
-
-class MockChatListenProvider extends Mock implements ChatListenProvider {}
 
 class MockStorageProvider extends Mock implements StorageProvider {}
 

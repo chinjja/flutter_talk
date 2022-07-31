@@ -15,14 +15,20 @@ class ChatPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = context.read<AuthRepository>().user;
     final chatRepo = context.read<ChatRepository>();
+    final listenRepo = context.read<ListenRepository>();
 
     return MultiBlocProvider(
       providers: [
         BlocProvider(
             create: (context) => ChatBloc(
                   chatRepository: chatRepo,
+                  listenRepository: listenRepo,
                 )..add(ChatStarted(chatId: chatId, user: user!))),
-        BlocProvider(create: (context) => ChatUserListBloc(chatRepo)),
+        BlocProvider(
+            create: (context) => ChatUserListBloc(
+                  chatRepository: chatRepo,
+                  listenRepository: listenRepo,
+                )),
       ],
       child: const ChatView(),
     );
