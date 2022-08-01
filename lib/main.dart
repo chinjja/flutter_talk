@@ -1,30 +1,25 @@
-import 'dart:io';
-
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:talk/repos/repos.dart';
 
 import 'app/app.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final dio = Dio(
-    BaseOptions(
-      baseUrl: const String.fromEnvironment(
-        'host.url',
-        defaultValue: 'http://localhost:8080',
-      ),
-    ),
-  );
-  final listenProvider = ListenProvider('${dio.options.baseUrl}/websocket');
-  final authProvider = AuthProvider(dio);
   final tokenProvider = TokenProvider();
-  final userProvider = UserProvider(dio);
-  final storageProvider = StorageProvider(dio);
-  final chatProvider = ChatProvider(dio);
-  final chatUserProvider = ChatUserProvider(dio);
-  final chatMessageProvider = ChatMessageProvider(dio);
-  final friendProvider = FriendProvider(dio);
+  const baseUrl = String.fromEnvironment(
+    'host.url',
+    defaultValue: 'localhost:8080',
+  );
+  final client = ApiClient(baseUrl, http.Client(), tokenProvider);
+  final listenProvider = ListenProvider('http://$baseUrl/websocket');
+  final authProvider = AuthProvider(client);
+  final userProvider = UserProvider(client);
+  final storageProvider = StorageProvider(client);
+  final chatProvider = ChatProvider(client);
+  final chatUserProvider = ChatUserProvider(client);
+  final chatMessageProvider = ChatMessageProvider(client);
+  final friendProvider = FriendProvider(client);
 
   final authRepository = AuthRepository(
     authProvider,
@@ -41,54 +36,6 @@ void main() async {
     listenRepository,
   );
   final friendRepository = FriendRepository(friendProvider, listenRepository);
-
-  Future<bool> _refresh() async {
-    final token = await tokenProvider.read();
-    if (token != null) {
-      final refreshDio = Dio(BaseOptions(baseUrl: dio.options.baseUrl));
-      try {
-        final res = await refreshDio.post(
-          '/auth/refresh',
-          data: token.toJson(),
-        );
-        await tokenProvider
-            .write(token.copyWith(accessToken: res.data['accessToken']));
-        return true;
-      } on DioError catch (e) {
-        if (e.response?.statusCode == HttpStatus.unauthorized) {
-          authRepository.logout();
-        }
-      }
-    }
-    return false;
-  }
-
-  dio.interceptors.add(InterceptorsWrapper(
-    onRequest: (options, handler) async {
-      final token = await tokenProvider.read();
-      if (token != null) {
-        options.headers['Authorization'] = 'Bearer ${token.accessToken}';
-      }
-      handler.next(options);
-    },
-    onError: (error, handler) async {
-      if (error.response?.statusCode == HttpStatus.unauthorized) {
-        if (await _refresh()) {
-          final response = await dio.request(
-            error.requestOptions.path,
-            options: Options(
-              method: error.requestOptions.method,
-              headers: error.requestOptions.headers,
-            ),
-            data: error.requestOptions.data,
-            queryParameters: error.requestOptions.queryParameters,
-          );
-          return handler.resolve(response);
-        }
-      }
-      return handler.next(error);
-    },
-  ));
 
   await authRepository.init();
 

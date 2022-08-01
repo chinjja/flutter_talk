@@ -1,22 +1,22 @@
-import 'package:dio/dio.dart';
+import 'dart:convert';
 
-import '../auth_providers.dart';
+import '../../providers.dart';
 
 class AuthProvider {
-  final Dio _dio;
+  final ApiClient _client;
 
-  AuthProvider(this._dio);
+  AuthProvider(this._client);
 
   Future<void> register({
     required String username,
     required String password,
   }) async {
-    await _dio.post(
-      '/auth/register',
-      data: {
+    await _client.post(
+      _client.uri('/auth/register'),
+      body: jsonEncode({
         'username': username,
         'password': password,
-      },
+      }),
     );
   }
 
@@ -24,36 +24,51 @@ class AuthProvider {
     required String username,
     required String password,
   }) async {
-    final res = await _dio.post(
-      '/auth/login',
-      data: {
+    final res = await _client.post(
+      _client.uri('/auth/login'),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
         'username': username,
         'password': password,
-      },
+      }),
     );
-    return Token.fromJson(res.data);
+    final json = jsonDecode(res.body);
+    return Token.fromJson(json);
   }
 
   Future<void> logout() async {
-    await _dio.post('/auth/logout');
+    await _client.post(
+      _client.uri('/auth/logout'),
+    );
   }
 
   Future<void> sendCode() async {
-    await _dio.post('/verification/send-code');
+    await _client.post(
+      _client.uri('/verification/send-code'),
+    );
   }
 
   Future<void> verifyCode(String code) async {
-    await _dio.post('/verification/verify-code', data: {
-      'code': code,
-    });
+    await _client.post(
+      _client.uri('/verification/verify-code'),
+      body: jsonEncode({
+        'code': code,
+      }),
+    );
   }
 
   Future<bool> isVerified() async {
-    final res = await _dio.get('/verification/is-verified');
-    return res.data;
+    final res = await _client.get(
+      _client.uri('/verification/is-verified'),
+    );
+
+    final json = jsonDecode(res.body);
+    return json;
   }
 
   Future<void> sendResetPassword(String email) async {
-    await _dio.post('/auth/reset/$email');
+    await _client.post(
+      _client.uri('/auth/reset/$email'),
+    );
   }
 }
