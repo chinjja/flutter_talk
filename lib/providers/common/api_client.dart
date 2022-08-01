@@ -13,7 +13,7 @@ class ApiClient extends http.BaseClient {
   ApiClient(this.baseUrl, this._client, this._tokenProvider);
 
   Uri uri(String path, [Map<String, dynamic>? queryParameters]) {
-    return Uri.http(baseUrl, path, queryParameters);
+    return Uri.https(baseUrl, path, queryParameters);
   }
 
   @override

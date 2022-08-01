@@ -1,18 +1,22 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:talk/providers/common/my_http_overriedes.dart';
 import 'package:talk/repos/repos.dart';
 
 import 'app/app.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  HttpOverrides.global = MyHttpOverrides();
   final tokenProvider = TokenProvider();
   const baseUrl = String.fromEnvironment(
     'host.url',
-    defaultValue: 'localhost:8080',
+    defaultValue: 'localhost:8443',
   );
   final client = ApiClient(baseUrl, http.Client(), tokenProvider);
-  final listenProvider = ListenProvider('http://$baseUrl/websocket');
+  final listenProvider = ListenProvider('https://$baseUrl/websocket');
   final authProvider = AuthProvider(client);
   final userProvider = UserProvider(client);
   final storageProvider = StorageProvider(client);
