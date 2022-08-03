@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -15,8 +13,11 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => ProfileBloc(context.read<UserRepository>())
-        ..add(ProfileStarted(username)),
+      create: (context) => ProfileBloc(
+        context.read<UserRepository>(),
+        context.read<StorageRepository>(),
+        context.read<ListenRepository>(),
+      )..add(ProfileStarted(username)),
       child: const ProfileView(),
     );
   }
@@ -29,46 +30,32 @@ class ProfileView extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ProfileBloc, ProfileState>(
       builder: (context, state) {
-        bool hasPhoto = state.user?.photoId != null;
-        return Container(
-          color: hasPhoto ? null : Theme.of(context).colorScheme.surface,
-          decoration: hasPhoto
-              ? BoxDecoration(
-                  image: DecorationImage(
-                    image: MemoryImage(Uint8List.fromList([])),
-                    fit: BoxFit.cover,
-                  ),
-                )
-              : null,
-          child: Scaffold(
-            backgroundColor: Colors.transparent,
-            appBar: AppBar(
-              backgroundColor: Colors.transparent,
-              actions: const [
-                IconButton(
-                  icon: Icon(Icons.money),
-                  onPressed: null,
-                ),
-                IconButton(
-                  icon: Icon(Icons.star),
-                  onPressed: null,
-                ),
-              ],
-            ),
-            body: SafeArea(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: const [
-                  _ProfilePhoto(),
-                  _NameText(),
-                  SizedBox(height: 8),
-                  _StateText(),
-                  SizedBox(height: 8),
-                  Divider(),
-                  SizedBox(height: 8),
-                  _BottomActions(),
-                ],
+        return Scaffold(
+          appBar: AppBar(
+            actions: const [
+              IconButton(
+                icon: Icon(Icons.money),
+                onPressed: null,
               ),
+              IconButton(
+                icon: Icon(Icons.star),
+                onPressed: null,
+              ),
+            ],
+          ),
+          body: SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: const [
+                _ProfilePhoto(),
+                _NameText(),
+                SizedBox(height: 8),
+                _StateText(),
+                SizedBox(height: 8),
+                Divider(),
+                SizedBox(height: 8),
+                _BottomActions(),
+              ],
             ),
           ),
         );
@@ -87,7 +74,10 @@ class _ProfilePhoto extends StatelessWidget {
       height: 96,
       child: BlocBuilder<ProfileBloc, ProfileState>(
         builder: (context, state) {
-          return const CircleAvatar();
+          final photo = state.photo;
+          return CircleAvatar(
+            backgroundImage: photo != null ? MemoryImage(photo) : null,
+          );
         },
       ),
     );
@@ -101,8 +91,7 @@ class _NameText extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ProfileBloc, ProfileState>(
       builder: (context, state) {
-        final user = state.user;
-        return Text(user?.name ?? user?.username ?? '');
+        return Text(state.name);
       },
     );
   }
@@ -115,8 +104,7 @@ class _StateText extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ProfileBloc, ProfileState>(
       builder: (context, state) {
-        final user = state.user;
-        return Text(user?.state ?? '');
+        return Text(state.state);
       },
     );
   }

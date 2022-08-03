@@ -103,4 +103,15 @@ class ListenProvider {
       ));
     });
   }
+
+  Unsubscribe subscribeToUser(OnUserEvent onData) {
+    return _subscribeToUser((event) {
+      if (event.objectType != 'User') return;
+
+      onData(UserEvent(
+        command: event.command,
+        user: User.fromJson(event.data),
+      ));
+    });
+  }
 }

@@ -28,4 +28,7 @@ class ListenRepository {
 
   Unsubscribe subscribeToChatMessage(Chat chat, OnChatMessageEvent onData) =>
       _listenProvider.subscribeToChatMessage(chat, onData);
+
+  Unsubscribe subscribeToUser(OnUserEvent onData) =>
+      _listenProvider.subscribeToUser(onData);
 }

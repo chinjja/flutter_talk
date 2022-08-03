@@ -20,34 +20,15 @@ void main() {
       storageProvider = StorageProvider(dio);
     });
 
-    test('save()', () async {
-      final data = Uint8List.fromList([1, 2]);
-      final storage = Storage(id: '1', data: data);
-      final res = StorageId(id: '1');
-      when(() => dio.post('/storage', data: storage.toJson()))
-          .thenAnswer((_) async => FakeResponse(data: res.toJson()));
-
-      final saved = await storageProvider.save(storage);
-      expect(saved, res);
-    });
-
     test('get()', () async {
       final data = Uint8List.fromList([1, 2]);
-      final res = StorageData(data: data);
-      when(() => dio.get('/storage/1'))
-          .thenAnswer((_) async => FakeResponse(data: res.toJson()));
+      when(() => dio.get(
+            '/storage/1',
+            options: any(named: 'options'),
+          )).thenAnswer((_) async => FakeResponse(data: data));
 
-      final loaded = await storageProvider.get(id: '1');
-      expect(loaded, res);
-    });
-
-    test('delete()', () async {
-      when(() => dio.delete('/storage/1'))
-          .thenAnswer((_) async => FakeResponse());
-
-      await storageProvider.delete(id: '1');
-
-      verify(() => dio.delete('/storage/1')).called(1);
+      final res = await storageProvider.get(id: '1');
+      expect(res, data);
     });
   });
 }

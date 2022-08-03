@@ -20,11 +20,11 @@ class ProfileDirectChatClicked extends ProfileEvent {
   const ProfileDirectChatClicked();
 }
 
-class ProfilePhotoUpload extends ProfileEvent {
-  final Uint8List photo;
+class ProfileUpdated extends ProfileEvent {
+  final User user;
 
-  const ProfilePhotoUpload(this.photo);
+  const ProfileUpdated(this.user);
 
   @override
-  List<Object> get props => [photo];
+  List<Object> get props => [user];
 }
