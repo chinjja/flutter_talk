@@ -225,7 +225,10 @@ class FriendTile extends StatelessWidget {
         ],
       ),
       onTap: () {
-        context.go('/home/profile/${Uri.encodeComponent(user.username)}');
+        context.goNamed('profile', params: {
+          'tab': 'home',
+          'username': user.username,
+        });
       },
     );
   }
