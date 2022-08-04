@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:talk/common/common.dart';
 import 'package:talk/repos/repos.dart';
 
 import '../profile.dart';
@@ -15,7 +16,6 @@ class ProfilePage extends StatelessWidget {
     return BlocProvider(
       create: (context) => ProfileBloc(
         context.read<UserRepository>(),
-        context.read<StorageRepository>(),
         context.read<ListenRepository>(),
       )..add(ProfileStarted(username)),
       child: const ProfileView(),
@@ -74,10 +74,7 @@ class _ProfilePhoto extends StatelessWidget {
       height: 96,
       child: BlocBuilder<ProfileBloc, ProfileState>(
         builder: (context, state) {
-          final photo = state.photo;
-          return CircleAvatar(
-            backgroundImage: photo != null ? MemoryImage(photo) : null,
-          );
+          return UserAvatar(state.user);
         },
       ),
     );
@@ -91,7 +88,8 @@ class _NameText extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ProfileBloc, ProfileState>(
       builder: (context, state) {
-        return Text(state.name);
+        final user = state.user;
+        return Text(user?.name ?? user?.username ?? '');
       },
     );
   }
@@ -104,7 +102,8 @@ class _StateText extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ProfileBloc, ProfileState>(
       builder: (context, state) {
-        return Text(state.state);
+        final user = state.user;
+        return Text(user?.state ?? '');
       },
     );
   }

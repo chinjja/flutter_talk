@@ -23,14 +23,11 @@ void main() {
 
     late ProfileEditBloc bloc;
     late UserRepository userRepository;
-    late StorageRepository storageRepository;
 
     setUp(() {
       userRepository = MockUserRepository();
-      storageRepository = MockStorageRepository();
       bloc = ProfileEditBloc(
         userRepository,
-        storageRepository,
         user: user,
       );
     });
@@ -43,10 +40,6 @@ void main() {
     blocTest<ProfileEditBloc, ProfileEditState>(
       'emits [ProfileEditState, ProfileEditState] when ProfileEditStarted is added.',
       build: () => bloc,
-      setUp: () {
-        when(() => storageRepository.get(id: 'photoId'))
-            .thenAnswer((_) async => photo);
-      },
       act: (bloc) => bloc.add(ProfileEditStarted()),
       expect: () => [
         ProfileEditState(

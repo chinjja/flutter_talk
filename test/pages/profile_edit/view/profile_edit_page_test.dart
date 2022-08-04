@@ -20,15 +20,12 @@ void main() {
     group('init', () {
       late Widget widget;
       late UserRepository userRepository;
-      late StorageRepository storageRepository;
 
       setUp(() {
         userRepository = MockUserRepository();
-        storageRepository = MockStorageRepository();
         widget = MultiRepositoryProvider(
           providers: [
             RepositoryProvider.value(value: userRepository),
-            RepositoryProvider.value(value: storageRepository),
           ],
           child: MaterialApp(
             home: ProfileEditPage(user: user),

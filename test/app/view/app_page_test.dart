@@ -35,7 +35,6 @@ void main() {
         final friendRepository = MockFriendRepository();
         final authRepository = MockAuthRepository();
         final chatRepository = MockChatRepository();
-        final storageRepository = MockStorageRepository();
         final listenRepository = MockListenRepository();
         when(() => authRepository.onAuthChanged).thenAnswer(
           (_) => Stream.fromIterable([
@@ -52,7 +51,6 @@ void main() {
           friendRepository: friendRepository,
           authRepository: authRepository,
           chatRepository: chatRepository,
-          storageRepository: storageRepository,
           listenRepository: listenRepository,
         ));
         expect(find.byType(AppView), findsOneWidget);

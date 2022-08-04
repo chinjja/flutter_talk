@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:talk/common/common.dart';
 import 'package:talk/repos/repos.dart';
 
 import '../friend_list.dart';
@@ -47,10 +48,10 @@ class FriendListView extends StatelessWidget {
       ),
       body: const CustomScrollView(
         slivers: [
-          SliverUserView(),
-          SliverDivider(),
-          SliverFriendHeaderView(),
-          SliverFriendListView(),
+          _SliverUserView(),
+          _SliverDivider(),
+          _SliverFriendHeaderView(),
+          _SliverFriendListView(),
         ],
       ),
     );
@@ -129,20 +130,20 @@ class __UserSearchAlertDialogState extends State<_UserSearchAlertDialog> {
   }
 }
 
-class SliverUserView extends StatelessWidget {
-  const SliverUserView({Key? key}) : super(key: key);
+class _SliverUserView extends StatelessWidget {
+  const _SliverUserView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final user = context.auth;
     return SliverToBoxAdapter(
-      child: user == null ? const SizedBox() : FriendTile(user: user),
+      child: user == null ? const SizedBox() : _FriendTile(user: user),
     );
   }
 }
 
-class SliverDivider extends StatelessWidget {
-  const SliverDivider({Key? key}) : super(key: key);
+class _SliverDivider extends StatelessWidget {
+  const _SliverDivider({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -150,8 +151,8 @@ class SliverDivider extends StatelessWidget {
   }
 }
 
-class SliverFriendHeaderView extends StatelessWidget {
-  const SliverFriendHeaderView({Key? key}) : super(key: key);
+class _SliverFriendHeaderView extends StatelessWidget {
+  const _SliverFriendHeaderView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -173,8 +174,8 @@ class SliverFriendHeaderView extends StatelessWidget {
   }
 }
 
-class SliverFriendListView extends StatelessWidget {
-  const SliverFriendListView({Key? key}) : super(key: key);
+class _SliverFriendListView extends StatelessWidget {
+  const _SliverFriendListView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -192,7 +193,7 @@ class SliverFriendListView extends StatelessWidget {
           delegate: SliverChildBuilderDelegate(
             (context, index) {
               final friend = state.friends[index];
-              return FriendTile(user: friend.user);
+              return _FriendTile(user: friend.user);
             },
             childCount: state.friends.length,
           ),
@@ -202,28 +203,17 @@ class SliverFriendListView extends StatelessWidget {
   }
 }
 
-class FriendTile extends StatelessWidget {
+class _FriendTile extends StatelessWidget {
   final User user;
-  const FriendTile({
+  const _FriendTile({
     Key? key,
     required this.user,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: const CircleAvatar(child: Icon(Icons.person)),
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(user.name ?? user.username),
-          if (user.state != null)
-            Text(
-              user.state ?? '',
-              style: const TextStyle(fontSize: 10),
-            ),
-        ],
-      ),
+    return UserTile(
+      user,
       onTap: () {
         context.goNamed('profile', params: {
           'tab': 'home',

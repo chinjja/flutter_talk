@@ -12,7 +12,6 @@ class App extends StatelessWidget {
   final FriendRepository friendRepository;
   final AuthRepository authRepository;
   final ChatRepository chatRepository;
-  final StorageRepository storageRepository;
   final ListenRepository listenRepository;
 
   const App({
@@ -21,7 +20,6 @@ class App extends StatelessWidget {
     required this.friendRepository,
     required this.authRepository,
     required this.chatRepository,
-    required this.storageRepository,
     required this.listenRepository,
   }) : super(key: key);
 
@@ -29,9 +27,6 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
-        RepositoryProvider.value(
-          value: storageRepository,
-        ),
         RepositoryProvider.value(
           value: userRepository,
         ),

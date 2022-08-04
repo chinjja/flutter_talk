@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:talk/common/common.dart';
 import 'package:talk/pages/chat_user_list/bloc/chat_user_list_bloc.dart';
 import 'package:talk/pages/chat_user_list/view/chat_user_list_view.dart';
 import 'package:talk/repos/repos.dart';
@@ -314,17 +315,13 @@ class _MessageTile extends StatelessWidget {
         children: [
           SizedBox(
             width: 48,
-            child: firstMessage
-                ? const CircleAvatar(
-                    child: Icon(Icons.person),
-                  )
-                : null,
+            child: firstMessage ? UserAvatar(message.sender) : null,
           ),
           Flexible(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (firstMessage) Text(message.sender.username),
+                if (firstMessage) UserName(message.sender),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [

@@ -5,11 +5,17 @@ import 'package:talk/repos/repos.dart';
 
 import 'app/app.dart';
 
+late String storageUrl;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   const baseUrl = String.fromEnvironment(
     'base-url',
     defaultValue: 'http://localhost:8080',
+  );
+  storageUrl = const String.fromEnvironment(
+    'storage-url',
+    defaultValue: 'http://localhost:8080/storage',
   );
   final dio = Dio(
     BaseOptions(baseUrl: baseUrl),
@@ -18,7 +24,6 @@ void main() async {
   final authProvider = AuthProvider(dio);
   final tokenProvider = TokenProvider();
   final userProvider = UserProvider(dio);
-  final storageProvider = StorageProvider(dio);
   final chatProvider = ChatProvider(dio);
   final chatUserProvider = ChatUserProvider(dio);
   final chatMessageProvider = ChatMessageProvider(dio);
@@ -31,7 +36,6 @@ void main() async {
   );
   final listenRepository = ListenRepository(authRepository, listenProvider);
   final userRepository = UserRepository(userProvider);
-  final storageRepository = StorageRepository(storageProvider);
   final chatRepository = ChatRepository(
     chatProvider,
     chatUserProvider,
@@ -51,7 +55,6 @@ void main() async {
       friendRepository: friendRepository,
       authRepository: authRepository,
       chatRepository: chatRepository,
-      storageRepository: storageRepository,
       listenRepository: listenRepository,
     ),
   );

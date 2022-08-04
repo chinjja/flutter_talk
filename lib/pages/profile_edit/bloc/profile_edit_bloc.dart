@@ -14,20 +14,19 @@ part 'profile_edit_bloc.g.dart';
 
 class ProfileEditBloc extends Bloc<ProfileEditEvent, ProfileEditState> {
   final UserRepository _userRepository;
-  final StorageRepository _storageRepository;
 
   ProfileEditBloc(
-    this._userRepository,
-    this._storageRepository, {
+    this._userRepository, {
     required User user,
   }) : super(ProfileEditState(user: user, name: user.name, state: user.state)) {
     on<ProfileEditStarted>((event, emit) async {
-      if (state.status.isPure) {
-        final photo = user.photoId == null
-            ? null
-            : await _storageRepository.get(id: user.photoId!);
-        emit(state.copyWith.photo(photo));
-      }
+      // if (state.status.isPure) {
+      //   final photo = user.photoId == null
+      //       ? null
+      //       : await _storageRepository.get(id: user.photoId!);
+
+      //   emit(state.copyWith.photo(photo));
+      // }
     });
 
     on<ProfileEditPickingPhoto>((event, emit) async {

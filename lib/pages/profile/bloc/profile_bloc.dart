@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'dart:typed_data';
 
 import 'package:bloc/bloc.dart';
 import 'package:copy_with_extension/copy_with_extension.dart';
@@ -14,14 +13,12 @@ part 'profile_bloc.g.dart';
 
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final UserRepository _userRepository;
-  final StorageRepository _storageRepository;
   final ListenRepository _listenRepository;
 
   Unsubscribe? _unsubscribe;
 
   ProfileBloc(
     this._userRepository,
-    this._storageRepository,
     this._listenRepository,
   ) : super(const ProfileState()) {
     on<ProfileStarted>((event, emit) async {
@@ -33,15 +30,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         emit(state.copyWith(
           status: FetchStatus.success,
           user: user,
-          name: user.name ?? user.username,
-          state: user.state,
         ));
-        final photoId = user.photoId;
-        if (photoId != null) {
-          emit(state.copyWith.photo(await _storageRepository.get(id: photoId)));
-        }
       } catch (e) {
-        log(e.toString());
         emit(state.copyWith.status(FetchStatus.failure));
       }
       _unsubscribe = _listenRepository.subscribeToUser((event) async {
@@ -50,17 +40,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     });
 
     on<ProfileUpdated>((event, emit) async {
-      Uint8List? photo;
       final user = event.user;
-      if (user.photoId != null) {
-        photo = await _storageRepository.get(id: user.photoId!);
-      }
       emit(state.copyWith(
         status: FetchStatus.success,
         user: user,
-        name: user.name ?? user.username,
-        state: user.state,
-        photo: photo,
       ));
     });
   }

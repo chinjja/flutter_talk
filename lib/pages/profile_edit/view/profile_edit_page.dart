@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:go_router/go_router.dart';
+import 'package:talk/common/common.dart';
 import 'package:talk/repos/repos.dart';
 
 import '../profile_edit.dart';
@@ -18,7 +19,6 @@ class ProfileEditPage extends StatelessWidget {
     return BlocProvider(
       create: (context) => ProfileEditBloc(
         context.read<UserRepository>(),
-        context.read<StorageRepository>(),
         user: user,
       )..add(const ProfileEditStarted()),
       child: BlocListener<ProfileEditBloc, ProfileEditState>(
@@ -79,7 +79,7 @@ class _ProfilePhoto extends StatelessWidget {
         builder: (context, state) {
           final photo = state.photo;
           if (photo == null) {
-            return const CircleAvatar();
+            return UserAvatar(state.user);
           }
           return CircleAvatar(backgroundImage: MemoryImage(photo));
         },
@@ -156,13 +156,9 @@ class _SubmitButton extends StatelessWidget {
       builder: (context, state) {
         return TextButton(
             key: const Key('profileEditView_submit_button'),
-            onPressed: state.user == null
-                ? null
-                : () {
-                    context
-                        .read<ProfileEditBloc>()
-                        .add(const ProfileEditSubmitted());
-                  },
+            onPressed: () {
+              context.read<ProfileEditBloc>().add(const ProfileEditSubmitted());
+            },
             child: const Text('완료'));
       },
     );

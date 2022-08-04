@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
+import 'package:talk/common/common.dart';
 import 'package:talk/pages/chat/bloc/chat_bloc.dart';
 import 'package:talk/pages/chat_user_list/bloc/chat_user_list_bloc.dart';
 import 'package:talk/repos/repos.dart';
@@ -85,7 +86,7 @@ class _MemberList extends StatelessWidget {
     return SliverStickyHeader(
       header: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        child: const Text('대화상대'),
+        child: const _Title(),
       ),
       sliver: BlocBuilder<ChatUserListBloc, ChatUserListState>(
         builder: (context, state) {
@@ -96,9 +97,9 @@ class _MemberList extends StatelessWidget {
                   return const _AddMemberTile();
                 }
                 final item = state.users[index - 1];
-                return ListTile(
-                  leading: const CircleAvatar(child: Icon(Icons.person)),
-                  title: Text(item.user.username),
+                return UserTile(
+                  item.user,
+                  hideState: true,
                 );
               },
               childCount: state.users.length + 1,
@@ -106,6 +107,19 @@ class _MemberList extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+}
+
+class _Title extends StatelessWidget {
+  const _Title({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ChatUserListBloc, ChatUserListState>(
+      builder: (context, state) {
+        return Text('대화상대 ${state.users.length}');
+      },
     );
   }
 }
@@ -167,25 +181,31 @@ class __FriendSelectionViewState extends State<_FriendSelectionView> {
                   itemBuilder: (context, index) {
                     final friend = friends![index];
                     final username = friend.user.username;
-                    return CheckboxListTile(
-                      title: Text(username),
-                      value: _checked.contains(username),
-                      onChanged: alreadyChecked.contains(username)
-                          ? null
-                          : (value) {
-                              setState(() {
-                                if (value ?? false) {
-                                  _checked.add(username);
-                                } else {
-                                  _checked.remove(username);
-                                }
-                              });
-                            },
+                    return UserTile(
+                      friend.user,
+                      selected: _checked.contains(username),
+                      trailing: Checkbox(
+                        value: _checked.contains(username),
+                        onChanged: (_) => _handle(friend),
+                      ),
+                      enabled: !alreadyChecked.contains(username),
+                      onTap: () => _handle(friend),
                     );
                   },
                 );
               },
             ),
     );
+  }
+
+  void _handle(Friend friend) {
+    final username = friend.user.username;
+    setState(() {
+      if (_checked.contains(username)) {
+        _checked.remove(username);
+      } else {
+        _checked.add(username);
+      }
+    });
   }
 }
