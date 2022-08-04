@@ -12,12 +12,14 @@ class FriendListState extends Equatable {
   final FriendListStatus status;
   final FriendListStatus addStatus;
   final List<Friend> friends;
+  final User user;
   const FriendListState({
     this.status = FriendListStatus.initial,
     this.addStatus = FriendListStatus.initial,
     this.friends = const [],
+    required this.user,
   });
 
   @override
-  List<Object> get props => [status, addStatus, friends];
+  List<Object?> get props => [status, addStatus, friends, user];
 }

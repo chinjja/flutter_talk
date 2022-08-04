@@ -20,7 +20,7 @@ class ProfileEditPage extends StatelessWidget {
       create: (context) => ProfileEditBloc(
         context.read<UserRepository>(),
         user: user,
-      )..add(const ProfileEditStarted()),
+      ),
       child: BlocListener<ProfileEditBloc, ProfileEditState>(
         listenWhen: (previous, current) => previous.status != current.status,
         listener: (context, state) {

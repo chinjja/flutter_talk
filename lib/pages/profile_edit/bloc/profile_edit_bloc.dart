@@ -19,16 +19,6 @@ class ProfileEditBloc extends Bloc<ProfileEditEvent, ProfileEditState> {
     this._userRepository, {
     required User user,
   }) : super(ProfileEditState(user: user, name: user.name, state: user.state)) {
-    on<ProfileEditStarted>((event, emit) async {
-      // if (state.status.isPure) {
-      //   final photo = user.photoId == null
-      //       ? null
-      //       : await _storageRepository.get(id: user.photoId!);
-
-      //   emit(state.copyWith.photo(photo));
-      // }
-    });
-
     on<ProfileEditPickingPhoto>((event, emit) async {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.image,

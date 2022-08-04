@@ -15,17 +15,22 @@ void main() {
     late AuthProvider authProvider;
     late TokenProvider tokenProvider;
     late UserProvider userProvider;
+    late ListenRepository listenRepository;
     late AuthRepository authRepository;
 
     setUp(() {
       authProvider = MockAuthProvider();
       tokenProvider = MockTokenProvider();
       userProvider = MockUserProvider();
+      listenRepository = MockListenRepository();
       authRepository = AuthRepository(
         authProvider,
         tokenProvider,
         userProvider,
+        listenRepository,
       );
+      when(() => listenRepository.onConnectedUser)
+          .thenAnswer((_) => Stream.value(null));
     });
 
     group('init()', () {
@@ -101,6 +106,8 @@ void main() {
             )).thenAnswer((_) async => token);
         when(() => authProvider.isVerified()).thenAnswer((_) async => true);
         when(() => tokenProvider.write(token)).thenAnswer((_) async => {});
+        when(() => userProvider.get(username: 'user'))
+            .thenAnswer((_) async => user);
 
         authRepository.login(
           username: 'user',
@@ -167,6 +174,8 @@ void main() {
         when(() => tokenProvider.decode(token.accessToken))
             .thenReturn({'sub': 'user'});
         authRepository.verifyCode("1234");
+        when(() => userProvider.get(username: 'user'))
+            .thenAnswer((_) async => user);
 
         await expectLater(authRepository.onAuthChanged, emits(authentication));
         verify(() => authProvider.verifyCode("1234")).called(1);

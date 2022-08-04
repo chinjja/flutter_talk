@@ -7,8 +7,12 @@ abstract class FriendListEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class FriendListInited extends FriendListEvent {
-  const FriendListInited();
+class FriendListListenStarted extends FriendListEvent {
+  const FriendListListenStarted();
+}
+
+class FriendListUserListenStarted extends FriendListEvent {
+  const FriendListUserListenStarted();
 }
 
 class FriendAdded extends FriendListEvent {
@@ -27,4 +31,13 @@ class FriendRemoved extends FriendListEvent {
 
   @override
   List<Object> get props => [friend];
+}
+
+class FriendListUserChanged extends FriendListEvent {
+  final User user;
+
+  const FriendListUserChanged(this.user);
+
+  @override
+  List<Object> get props => [user];
 }

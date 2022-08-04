@@ -7,10 +7,6 @@ abstract class ProfileEditEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class ProfileEditStarted extends ProfileEditEvent {
-  const ProfileEditStarted();
-}
-
 class ProfileEditPickingPhoto extends ProfileEditEvent {
   const ProfileEditPickingPhoto();
 }

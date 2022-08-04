@@ -21,6 +21,12 @@ class FriendRepository {
             _friendsChanged.add(old
                 .where((e) => e.user.username != event.friend.user.username)
                 .toList());
+          } else if (event.isUpdated) {
+            _friendsChanged.add(old
+                .map((e) => e.user.username == event.friend.user.username
+                    ? event.friend
+                    : e)
+                .toList());
           }
         });
       }

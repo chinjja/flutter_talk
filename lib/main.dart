@@ -29,12 +29,20 @@ void main() async {
   final chatMessageProvider = ChatMessageProvider(dio);
   final friendProvider = FriendProvider(dio);
 
+  final listenRepository = ListenRepository(listenProvider);
   final authRepository = AuthRepository(
     authProvider,
     tokenProvider,
     userProvider,
+    listenRepository,
   );
-  final listenRepository = ListenRepository(authRepository, listenProvider);
+  authRepository.onAuthChanged.listen((auth) {
+    if (auth == null) {
+      listenProvider.deactivate();
+    } else if (auth.emailVerified) {
+      listenProvider.activate(auth.principal);
+    }
+  });
   final userRepository = UserRepository(userProvider);
   final chatRepository = ChatRepository(
     chatProvider,

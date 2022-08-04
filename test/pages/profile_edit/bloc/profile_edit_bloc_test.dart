@@ -38,15 +38,6 @@ void main() {
     });
 
     blocTest<ProfileEditBloc, ProfileEditState>(
-      'emits [ProfileEditState, ProfileEditState] when ProfileEditStarted is added.',
-      build: () => bloc,
-      act: (bloc) => bloc.add(ProfileEditStarted()),
-      expect: () => [
-        ProfileEditState(
-            user: user, name: 'name', state: 'state', photo: photo),
-      ],
-    );
-    blocTest<ProfileEditBloc, ProfileEditState>(
       'emits [ProfileEditState] when ProfileEditNameChanged is added.',
       build: () => bloc,
       act: (bloc) => bloc.add(ProfileEditNameChanged('user')),

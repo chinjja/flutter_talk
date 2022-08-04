@@ -12,9 +12,13 @@ class FriendListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) =>
-          FriendListBloc(chatRepository: context.read<FriendRepository>())
-            ..add(const FriendListInited()),
+      create: (context) => FriendListBloc(
+        context.auth!,
+        context.read<AuthRepository>(),
+        context.read<FriendRepository>(),
+      )
+        ..add(const FriendListListenStarted())
+        ..add(const FriendListUserListenStarted()),
       child: const FriendListView(),
     );
   }
@@ -135,9 +139,12 @@ class _SliverUserView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.auth;
-    return SliverToBoxAdapter(
-      child: user == null ? const SizedBox() : _FriendTile(user: user),
+    return BlocBuilder<FriendListBloc, FriendListState>(
+      builder: (context, state) {
+        return SliverToBoxAdapter(
+          child: _FriendTile(user: state.user),
+        );
+      },
     );
   }
 }
@@ -204,7 +211,7 @@ class _SliverFriendListView extends StatelessWidget {
 }
 
 class _FriendTile extends StatelessWidget {
-  final User user;
+  final User? user;
   const _FriendTile({
     Key? key,
     required this.user,
@@ -214,12 +221,14 @@ class _FriendTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return UserTile(
       user,
-      onTap: () {
-        context.goNamed('profile', params: {
-          'tab': 'home',
-          'username': user.username,
-        });
-      },
+      onTap: user != null
+          ? () {
+              context.goNamed('profile', params: {
+                'tab': 'home',
+                'username': user!.username,
+              });
+            }
+          : null,
     );
   }
 }
