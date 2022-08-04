@@ -9,16 +9,16 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final AuthRepository _authRepository;
   AppBloc({required AuthRepository authRepository})
       : _authRepository = authRepository,
-        super(const AppState.unknown()) {
+        super(AppState.unknown) {
     on<AppInited>((event, emit) async {
       await emit.onEach(_authRepository.onAuthChanged,
           onData: (Authentication? auth) {
         if (auth == null) {
-          emit(const AppState.unauthentication());
+          emit(AppState.unauthentication);
         } else if (auth.emailVerified) {
-          emit(AppState.authentication(user: auth.principal));
+          emit(AppState.authentication);
         } else if (!auth.emailVerified) {
-          emit(AppState.emailNotVerified(user: auth.principal));
+          emit(AppState.emailNotVerified);
         }
       });
     });

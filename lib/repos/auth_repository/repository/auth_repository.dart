@@ -43,22 +43,21 @@ class AuthRepository {
     });
 
     try {
-      final data = await _tokenProvider.read();
-      if (data != null && !_tokenProvider.isExpired(data.refreshToken)) {
-        final verified = await isVerified();
-        final map = _tokenProvider.decode(data.accessToken);
-        var username = map['sub'];
-        final user = await _userProvider.get(username: username);
+      final token = await _tokenProvider.read();
+      if (token != null && !_tokenProvider.isExpired(token.refreshToken)) {
+        final map = _tokenProvider.decode(token.accessToken);
+        final user = await _userProvider.get(username: map['sub']);
         _user = user;
         _authChanged.add(Authentication(
           principal: user,
-          emailVerified: verified,
+          emailVerified: true,
         ));
         return;
       }
     } catch (e) {
       log(e.toString());
     }
+    _user = null;
     _tokenProvider.clear();
     _authChanged.add(null);
   }

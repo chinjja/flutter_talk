@@ -13,14 +13,14 @@ void main() {
 
     setUp(() {
       bloc = MockAppBloc();
-      when(() => bloc.state).thenReturn(AppState.unknown());
+      when(() => bloc.state).thenReturn(AppState.unknown);
     });
 
     test('initial state is AppState.unknown', () {
       final authRepository = MockAuthRepository();
       expect(
         AppBloc(authRepository: authRepository).state,
-        AppState.unknown(),
+        AppState.unknown,
       );
     });
 

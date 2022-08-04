@@ -153,27 +153,27 @@ class _AppViewState extends State<AppView> {
     ],
     redirect: (state) {
       final bloc = context.read<AppBloc>();
-      switch (bloc.state.status) {
-        case AppStatus.unknown:
+      switch (bloc.state) {
+        case AppState.unknown:
           if (state.subloc != '/splash') {
             return '/splash';
           }
           break;
-        case AppStatus.authentication:
+        case AppState.authentication:
           if (state.subloc == '/login' ||
               state.subloc == '/splash' ||
               state.subloc == '/verify-email') {
             return '/';
           }
           break;
-        case AppStatus.unauthentication:
+        case AppState.unauthentication:
           if (state.subloc == '/register') return null;
           if (state.subloc == '/reset-password') return null;
           if (state.subloc != '/login') {
             return '/login';
           }
           break;
-        case AppStatus.emailNotVerified:
+        case AppState.emailNotVerified:
           if (state.subloc != '/verify-email') {
             return '/verify-email';
           }

@@ -58,13 +58,12 @@ void main() {
         verifyNever(() => authProvider.isVerified());
       });
 
-      test('when token is not expired then emits authentication', () async {
+      test('when user is received then emits authentication', () async {
         when(() => tokenProvider.read()).thenAnswer((_) async => token);
         when(() => tokenProvider.isExpired(token.refreshToken))
             .thenReturn(false);
         when(() => tokenProvider.decode(token.accessToken))
             .thenReturn({'sub': 'user'});
-        when(() => authProvider.isVerified()).thenAnswer((_) async => true);
         when(() => userProvider.get(username: 'user'))
             .thenAnswer((_) async => user);
 
@@ -73,7 +72,23 @@ void main() {
         await expectLater(authRepository.onAuthChanged, emits(authentication));
 
         verifyNever(() => tokenProvider.clear());
-        verify(() => authProvider.isVerified()).called(1);
+      });
+
+      test('when get user is failed then emits null', () async {
+        when(() => tokenProvider.read()).thenAnswer((_) async => token);
+        when(() => tokenProvider.isExpired(token.refreshToken))
+            .thenReturn(false);
+        when(() => tokenProvider.decode(token.accessToken))
+            .thenReturn({'sub': 'user'});
+        when(() => tokenProvider.clear()).thenAnswer((_) async => {});
+        when(() => userProvider.get(username: 'user'))
+            .thenThrow(Exception('oops'));
+
+        authRepository.init();
+
+        await expectLater(authRepository.onAuthChanged, emits(null));
+
+        verify(() => tokenProvider.clear()).called(1);
       });
     });
 

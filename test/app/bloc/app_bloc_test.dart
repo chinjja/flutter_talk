@@ -19,7 +19,7 @@ void main() {
     });
 
     test('init state', () {
-      expect(bloc.state, AppState.unknown());
+      expect(bloc.state, AppState.unknown);
     });
 
     blocTest<AppBloc, AppState>(
@@ -31,7 +31,7 @@ void main() {
       },
       act: (bloc) => bloc.add(AppInited()),
       expect: () => [
-        AppState.unauthentication(),
+        AppState.unauthentication,
       ],
     );
 
@@ -50,7 +50,7 @@ void main() {
       },
       act: (bloc) => bloc.add(AppInited()),
       expect: () => [
-        AppState.authentication(user: User(username: 'user')),
+        AppState.authentication,
       ],
     );
 
@@ -69,7 +69,7 @@ void main() {
       },
       act: (bloc) => bloc.add(AppInited()),
       expect: () => [
-        AppState.emailNotVerified(user: User(username: 'user')),
+        AppState.emailNotVerified,
       ],
     );
 
