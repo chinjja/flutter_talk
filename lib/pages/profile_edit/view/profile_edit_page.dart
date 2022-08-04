@@ -29,7 +29,7 @@ class ProfileEditPage extends StatelessWidget {
           } else if (state.status.isSubmissionFailure) {
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
-              ..showSnackBar(const SnackBar(content: Text('Error occur!')));
+              ..showSnackBar(SnackBar(content: Text(state.error)));
           }
         },
         child: const ProfileEditView(),
@@ -50,19 +50,42 @@ class ProfileEditView extends StatelessWidget {
           _SubmitButton(),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: const [
-            _ProfilePhoto(),
-            SizedBox(height: 10),
-            _PickingPhotoButton(),
-            _NameField(),
-            _StateField(),
-          ],
-        ),
+      body: Column(
+        children: [
+          const _Indicator(),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: const [
+                  _ProfilePhoto(),
+                  SizedBox(height: 10),
+                  _PickingPhotoButton(),
+                  _NameField(),
+                  _StateField(),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
+    );
+  }
+}
+
+class _Indicator extends StatelessWidget {
+  const _Indicator({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ProfileEditBloc, ProfileEditState>(
+      builder: (context, state) {
+        if (state.status.isSubmissionInProgress) {
+          return const LinearProgressIndicator();
+        }
+        return const SizedBox();
+      },
     );
   }
 }
@@ -156,9 +179,13 @@ class _SubmitButton extends StatelessWidget {
       builder: (context, state) {
         return TextButton(
             key: const Key('profileEditView_submit_button'),
-            onPressed: () {
-              context.read<ProfileEditBloc>().add(const ProfileEditSubmitted());
-            },
+            onPressed: state.status.isSubmissionInProgress
+                ? null
+                : () {
+                    context
+                        .read<ProfileEditBloc>()
+                        .add(const ProfileEditSubmitted());
+                  },
             child: const Text('완료'));
       },
     );

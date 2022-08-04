@@ -6,6 +6,7 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:formz/formz.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:talk/common/common.dart';
 import 'package:talk/pages/pages.dart';
 import 'package:talk/repos/repos.dart';
 
@@ -23,12 +24,15 @@ void main() {
 
     late ProfileEditBloc bloc;
     late UserRepository userRepository;
+    late ImageResizer imageResizer;
 
     setUp(() {
+      imageResizer = MockImageResizer();
       userRepository = MockUserRepository();
       bloc = ProfileEditBloc(
         userRepository,
         user: user,
+        imageResizer: imageResizer,
       );
     });
 
@@ -72,15 +76,33 @@ void main() {
       blocTest<ProfileEditBloc, ProfileEditState>(
         'when user exists and update is success then emit success',
         build: () => bloc,
-        seed: () => ProfileEditState(user: user),
+        seed: () => ProfileEditState(
+            user: user, name: "name", state: "state", photo: photo),
         setUp: () {
-          when(() => userRepository.update()).thenAnswer((_) async => user);
+          when(() => userRepository.update(
+                name: "name",
+                state: "state",
+                photo: photo,
+              )).thenAnswer((_) async => user);
+          when(() => imageResizer.resize(photo, width: 256))
+              .thenAnswer((_) async => photo);
         },
         act: (bloc) => bloc.add(ProfileEditSubmitted()),
         expect: () => [
           ProfileEditState(
-              user: user, status: FormzStatus.submissionInProgress),
-          ProfileEditState(user: user, status: FormzStatus.submissionSuccess),
+            user: user,
+            name: "name",
+            state: "state",
+            photo: photo,
+            status: FormzStatus.submissionInProgress,
+          ),
+          ProfileEditState(
+            user: user,
+            name: "name",
+            state: "state",
+            photo: photo,
+            status: FormzStatus.submissionSuccess,
+          ),
         ],
       );
 
@@ -95,7 +117,10 @@ void main() {
         expect: () => [
           ProfileEditState(
               user: user, status: FormzStatus.submissionInProgress),
-          ProfileEditState(user: user, status: FormzStatus.submissionFailure),
+          ProfileEditState(
+              user: user,
+              status: FormzStatus.submissionFailure,
+              error: Exception('oops').toString()),
         ],
       );
     });

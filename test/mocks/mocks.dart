@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:talk/app/app.dart';
+import 'package:talk/common/common.dart';
 import 'package:talk/pages/pages.dart';
 import 'package:talk/repos/repos.dart';
 
@@ -41,3 +42,5 @@ class MockRegisterBloc extends MockBloc<RegisterEvent, RegisterState>
 
 class MockProfileEditBloc extends MockBloc<ProfileEditEvent, ProfileEditState>
     implements ProfileEditBloc {}
+
+class MockImageResizer extends Mock implements ImageResizer {}
