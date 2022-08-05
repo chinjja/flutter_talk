@@ -223,10 +223,14 @@ class _FriendTile extends StatelessWidget {
       user,
       onTap: user != null
           ? () {
-              context.goNamed('profile', params: {
-                'tab': 'home',
-                'username': user!.username,
-              });
+              context.goNamed(
+                'profile',
+                params: {
+                  'tab': 'home',
+                  'username': user!.username,
+                },
+                extra: user,
+              );
             }
           : null,
     );

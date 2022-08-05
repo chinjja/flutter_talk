@@ -89,7 +89,10 @@ class _AppViewState extends State<AppView> {
             name: 'profile',
             path: 'profile/:username',
             builder: (context, state) {
-              return ProfilePage(username: state.params['username']!);
+              return ProfilePage(
+                username: state.params['username']!,
+                user: state.extra as User?,
+              );
             },
           ),
         ],

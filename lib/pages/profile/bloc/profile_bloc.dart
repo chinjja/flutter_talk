@@ -17,10 +17,13 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
 
   Unsubscribe? _unsubscribe;
 
-  ProfileBloc(
-    this._userRepository,
-    this._listenRepository,
-  ) : super(const ProfileState()) {
+  ProfileBloc({
+    User? user,
+    required UserRepository userRepository,
+    required ListenRepository listenRepository,
+  })  : _userRepository = userRepository,
+        _listenRepository = listenRepository,
+        super(ProfileState(user: user)) {
     on<ProfileStarted>((event, emit) async {
       if (state.status != FetchStatus.initial) return;
 

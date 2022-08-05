@@ -8,15 +8,21 @@ import '../profile.dart';
 
 class ProfilePage extends StatelessWidget {
   final String username;
+  final User? user;
 
-  const ProfilePage({Key? key, required this.username}) : super(key: key);
+  const ProfilePage({
+    Key? key,
+    required this.username,
+    this.user,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => ProfileBloc(
-        context.read<UserRepository>(),
-        context.read<ListenRepository>(),
+        user: user,
+        userRepository: context.read<UserRepository>(),
+        listenRepository: context.read<ListenRepository>(),
       )..add(ProfileStarted(username)),
       child: const ProfileView(),
     );
