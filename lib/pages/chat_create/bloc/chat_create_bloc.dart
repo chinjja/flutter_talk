@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:equatable/equatable.dart';
+import 'package:formz/formz.dart';
 import 'package:talk/repos/repos.dart';
 
 part 'chat_create_event.dart';
@@ -24,14 +25,21 @@ class ChatCreateBloc extends Bloc<ChatCreateEvent, ChatCreateState> {
     });
     on<ChatCreateSubmitted>((event, emit) async {
       if (state.isValid) {
-        emit(state.copyWith(status: ChatCreateSubmitStatus.inProgress));
-        final chatId = await _chatRepository.createOpenChat(
-          title: state.title,
-        );
-        emit(state.copyWith(
-          status: ChatCreateSubmitStatus.success,
-          chatId: chatId,
-        ));
+        try {
+          emit(state.copyWith(status: FormzStatus.submissionInProgress));
+          final chatId = await _chatRepository.createOpenChat(
+            title: state.title,
+          );
+          emit(state.copyWith(
+            status: FormzStatus.submissionSuccess,
+            chatId: chatId,
+          ));
+        } catch (e) {
+          emit(state.copyWith(
+            status: FormzStatus.submissionFailure,
+            error: e,
+          ));
+        }
       }
     });
   }

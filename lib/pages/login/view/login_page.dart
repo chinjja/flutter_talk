@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:go_router/go_router.dart';
+import 'package:talk/common/common.dart';
 import 'package:talk/pages/reset_password/view/reset_password_page.dart';
 import 'package:talk/repos/repos.dart';
 
@@ -30,13 +31,7 @@ class LoginView extends StatelessWidget {
         listenWhen: (previous, current) => previous.status != current.status,
         listener: (context, state) {
           if (state.status.isSubmissionFailure) {
-            ScaffoldMessenger.of(context)
-              ..hideCurrentSnackBar()
-              ..showSnackBar(
-                const SnackBar(
-                  content: Text("Login: Something went wrong!"),
-                ),
-              );
+            showError(context, state.error);
           }
         },
         child: Container(

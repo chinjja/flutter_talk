@@ -4,7 +4,9 @@ import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:equatable/equatable.dart';
+import 'package:formz/formz.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:talk/common/common.dart';
 import 'package:talk/repos/repos.dart';
 
 part 'chat_event.dart';
@@ -27,7 +29,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       if (state.chat == null) {
         final chat = await _chatRepository.getChat(event.chatId);
         emit(state.copyWith(
-          fetchStatus: ChatStatus.inProgress,
+          fetchStatus: FetchStatus.loading,
           chat: chat,
           user: event.user,
         ));
@@ -36,7 +38,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
             await _chatRepository.getMessages(chat: chat, limit: 50);
         final chatUsers = await _chatRepository.getChatUsers(chat: chat);
         emit(state.copyWith(
-          fetchStatus: ChatStatus.success,
+          fetchStatus: FetchStatus.success,
           messages: messages,
           chatUsers: chatUsers,
           hasNextMessage: messages.length == 50,
@@ -90,14 +92,20 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       final chat = state.chat;
       if (chat != null && message.isNotEmpty) {
         try {
-          emit(state.copyWith(submitStatus: ChatStatus.inProgress));
+          emit(state.copyWith(submitStatus: FormzStatus.submissionInProgress));
           _chatRepository.sendMessage(
             chat: chat,
             message: message,
           );
-          emit(state.copyWith(submitStatus: ChatStatus.success, message: ''));
-        } catch (_) {
-          emit(state.copyWith(submitStatus: ChatStatus.failure));
+          emit(state.copyWith(
+            submitStatus: FormzStatus.submissionSuccess,
+            message: '',
+          ));
+        } catch (e) {
+          emit(state.copyWith(
+            submitStatus: FormzStatus.submissionFailure,
+            error: e,
+          ));
         }
       }
     });

@@ -32,7 +32,10 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         );
         emit(state.copyWith(status: FormzStatus.submissionSuccess));
       } catch (e) {
-        emit(state.copyWith(status: FormzStatus.submissionFailure));
+        emit(state.copyWith(
+          status: FormzStatus.submissionFailure,
+          error: e,
+        ));
       }
     });
   }

@@ -73,6 +73,8 @@ void main() {
     );
 
     group('ProfileEditSubmitted', () {
+      final exception = Exception('oops');
+
       blocTest<ProfileEditBloc, ProfileEditState>(
         'when user exists and update is success then emit success',
         build: () => bloc,
@@ -111,7 +113,7 @@ void main() {
         build: () => bloc,
         seed: () => ProfileEditState(user: user),
         setUp: () {
-          when(() => userRepository.update()).thenThrow(Exception('oops'));
+          when(() => userRepository.update()).thenThrow(exception);
         },
         act: (bloc) => bloc.add(ProfileEditSubmitted()),
         expect: () => [
@@ -120,7 +122,7 @@ void main() {
           ProfileEditState(
               user: user,
               status: FormzStatus.submissionFailure,
-              error: Exception('oops').toString()),
+              error: exception),
         ],
       );
     });

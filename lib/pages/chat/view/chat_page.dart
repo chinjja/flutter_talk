@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:formz/formz.dart';
 import 'package:intl/intl.dart';
 import 'package:talk/common/common.dart';
 import 'package:talk/pages/chat_user_list/bloc/chat_user_list_bloc.dart';
@@ -194,9 +195,11 @@ class __BottomViewState extends State<_BottomView> {
       listenWhen: (previous, current) =>
           previous.submitStatus != current.submitStatus,
       listener: (context, state) {
-        if (state.submitStatus == ChatStatus.success) {
+        if (state.submitStatus.isSubmissionSuccess) {
           controller.text = state.message;
           focusNode.requestFocus();
+        } else if (state.submitStatus.isSubmissionFailure) {
+          showError(context, state.error);
         }
       },
       builder: (context, state) {

@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:equatable/equatable.dart';
+import 'package:formz/formz.dart';
 import 'package:talk/common/common.dart';
 import 'package:talk/repos/repos.dart';
 
@@ -35,7 +36,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           user: user,
         ));
       } catch (e) {
-        emit(state.copyWith.status(FetchStatus.failure));
+        emit(state.copyWith(
+          status: FetchStatus.failure,
+          error: e,
+        ));
       }
       _unsubscribe = _listenRepository.subscribeToUser((event) async {
         add(ProfileUpdated(event.user));

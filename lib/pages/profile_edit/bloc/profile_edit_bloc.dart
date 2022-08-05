@@ -67,7 +67,7 @@ class ProfileEditBloc extends Bloc<ProfileEditEvent, ProfileEditState> {
       } catch (e) {
         emit(state.copyWith(
           status: FormzStatus.submissionFailure,
-          error: e.toString(),
+          error: e,
         ));
       }
     });

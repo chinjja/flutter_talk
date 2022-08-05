@@ -7,6 +7,7 @@ class VerifyEmailState extends Equatable {
   final FetchStatus sendStatus;
   final bool sendCode;
   final int seconds;
+  final dynamic error;
 
   const VerifyEmailState({
     this.code = '',
@@ -14,8 +15,10 @@ class VerifyEmailState extends Equatable {
     this.sendStatus = FetchStatus.initial,
     this.sendCode = false,
     this.seconds = 0,
+    this.error,
   });
 
   @override
-  List<Object> get props => [code, submitStatus, sendStatus, sendCode, seconds];
+  List<Object?> get props =>
+      [code, submitStatus, sendStatus, sendCode, seconds, error];
 }

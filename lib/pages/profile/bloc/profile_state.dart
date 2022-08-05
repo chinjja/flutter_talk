@@ -4,12 +4,14 @@ part of 'profile_bloc.dart';
 class ProfileState extends Equatable {
   final FetchStatus status;
   final User? user;
+  final dynamic error;
 
   const ProfileState({
     this.status = FetchStatus.initial,
     this.user,
+    this.error,
   });
 
   @override
-  List<Object?> get props => [status, user];
+  List<Object?> get props => [status, user, error];
 }

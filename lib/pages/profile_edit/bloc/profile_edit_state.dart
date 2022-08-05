@@ -7,14 +7,15 @@ class ProfileEditState extends Equatable {
   final Uint8List? photo;
   final String? name;
   final String? state;
-  final String error;
+  final dynamic error;
+
   const ProfileEditState({
     this.status = FormzStatus.pure,
     required this.user,
     this.photo,
     this.name,
     this.state,
-    this.error = '',
+    this.error,
   });
 
   @override

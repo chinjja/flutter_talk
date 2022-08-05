@@ -27,9 +27,7 @@ class ProfileEditPage extends StatelessWidget {
           if (state.status.isSubmissionSuccess) {
             context.pop();
           } else if (state.status.isSubmissionFailure) {
-            ScaffoldMessenger.of(context)
-              ..hideCurrentSnackBar()
-              ..showSnackBar(SnackBar(content: Text(state.error)));
+            showError(context, state.error);
           }
         },
         child: const ProfileEditView(),

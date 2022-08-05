@@ -27,8 +27,11 @@ class ResetPasswordBloc extends Bloc<ResetPasswordEvent, ResetPasswordState> {
           await _authRepository.sendResetPassword(state.email.value);
 
           emit(state.copyWith.status(FormzStatus.submissionSuccess));
-        } catch (_) {
-          emit(state.copyWith.status(FormzStatus.submissionFailure));
+        } catch (e) {
+          emit(state.copyWith(
+            status: FormzStatus.submissionFailure,
+            error: e,
+          ));
         }
       } else {
         emit(state.copyWith.status(FormzStatus.invalid));

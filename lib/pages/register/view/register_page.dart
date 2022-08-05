@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:go_router/go_router.dart';
+import 'package:talk/common/common.dart';
 import 'package:talk/repos/repos.dart';
 
 import '../register.dart';
@@ -18,6 +19,8 @@ class RegisterPage extends StatelessWidget {
         listener: (context, state) {
           if (state.status.isSubmissionSuccess) {
             context.pop();
+          } else if (state.status.isSubmissionFailure) {
+            showError(context, state.error);
           }
         },
         child: const RegisterView(),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:formz/formz.dart';
 import 'package:go_router/go_router.dart';
+import 'package:talk/common/common.dart';
 import 'package:talk/repos/repos.dart';
 
 import '../chat_create.dart';
@@ -16,8 +18,10 @@ class ChatCreatePage extends StatelessWidget {
       child: BlocListener<ChatCreateBloc, ChatCreateState>(
         listenWhen: (previous, current) => previous.status != current.status,
         listener: (context, state) {
-          if (state.status == ChatCreateSubmitStatus.success) {
+          if (state.status.isSubmissionSuccess) {
             context.go('/chat/chats/${state.chatId!}');
+          } else if (state.status.isSubmissionFailure) {
+            showError(context, state.error);
           }
         },
         child: const ChatCreateView(),

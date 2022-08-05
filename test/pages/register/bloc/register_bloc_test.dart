@@ -59,6 +59,7 @@ void main() {
 
     group('RegisterSubmitted', () {
       late RegisterState state;
+      final exception = Exception('oops');
 
       setUp(() {
         state = RegisterState(
@@ -92,7 +93,7 @@ void main() {
         setUp: () {
           when(() => authRepository.register(
               username: 'user@user.com',
-              password: '1234')).thenThrow(Exception('oops'));
+              password: '1234')).thenThrow(exception);
         },
         seed: () => state,
         act: (bloc) => bloc.add(RegisterSubmitted()),
@@ -102,6 +103,7 @@ void main() {
           ),
           state.copyWith(
             status: FormzStatus.submissionFailure,
+            error: exception,
           ),
         ],
       );

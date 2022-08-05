@@ -24,7 +24,15 @@ class ProfilePage extends StatelessWidget {
         userRepository: context.read<UserRepository>(),
         listenRepository: context.read<ListenRepository>(),
       )..add(ProfileStarted(username)),
-      child: const ProfileView(),
+      child: BlocListener<ProfileBloc, ProfileState>(
+        listenWhen: (previous, current) => previous.status != current.status,
+        listener: (context, state) {
+          if (state.status == FetchStatus.failure) {
+            showError(context, state.error);
+          }
+        },
+        child: const ProfileView(),
+      ),
     );
   }
 }

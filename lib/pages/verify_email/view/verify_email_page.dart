@@ -38,10 +38,7 @@ class VerifyEmailView extends StatelessWidget {
             previous.submitStatus != current.submitStatus,
         listener: (context, state) {
           if (state.submitStatus == FetchStatus.failure) {
-            ScaffoldMessenger.of(context)
-              ..hideCurrentSnackBar()
-              ..showSnackBar(
-                  const SnackBar(content: Text('Cannot verify code')));
+            showError(context, state.error);
           }
         },
         child: Container(

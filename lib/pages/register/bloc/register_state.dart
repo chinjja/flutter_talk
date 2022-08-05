@@ -6,12 +6,14 @@ class RegisterState extends Equatable {
   final Username username;
   final Password password;
   final ConfirmPassword confirmPassword;
+  final dynamic error;
 
   const RegisterState({
     this.status = FormzStatus.pure,
     this.username = const Username.pure(),
     this.password = const Password.pure(),
     this.confirmPassword = const ConfirmPassword.pure(),
+    this.error,
   });
 
   bool get isValid => username.valid && password.valid && confirmPassword.valid;
@@ -22,5 +24,6 @@ class RegisterState extends Equatable {
         username,
         password,
         confirmPassword,
+        error,
       ];
 }

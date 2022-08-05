@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:equatable/equatable.dart';
+import 'package:formz/formz.dart';
 import 'package:talk/common/common.dart';
 import 'package:talk/repos/auth_repository/auth_repository.dart';
 
@@ -38,8 +39,11 @@ class VerifyEmailBloc extends Bloc<VerifyEmailEvent, VerifyEmailState> {
 
         await _authRepository.verifyCode(code);
         emit(state.copyWith(submitStatus: FetchStatus.success));
-      } catch (_) {
-        emit(state.copyWith(submitStatus: FetchStatus.failure));
+      } catch (e) {
+        emit(state.copyWith(
+          submitStatus: FetchStatus.failure,
+          error: e,
+        ));
       }
     });
 

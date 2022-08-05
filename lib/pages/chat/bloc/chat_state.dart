@@ -9,26 +9,28 @@ enum ChatStatus {
 
 @CopyWith()
 class ChatState extends Equatable {
-  final ChatStatus fetchStatus;
-  final ChatStatus submitStatus;
+  final FetchStatus fetchStatus;
+  final FormzStatus submitStatus;
   final List<ChatMessage> messages;
   final List<ChatUser> chatUsers;
   final Chat? chat;
   final User? user;
   final String message;
   final bool hasNextMessage;
+  final dynamic error;
 
   bool get isValid => message.trim().isNotEmpty;
 
   const ChatState({
-    this.fetchStatus = ChatStatus.initial,
-    this.submitStatus = ChatStatus.initial,
+    this.fetchStatus = FetchStatus.initial,
+    this.submitStatus = FormzStatus.pure,
     this.messages = const [],
     this.chatUsers = const [],
     this.chat,
     this.user,
     this.message = '',
     this.hasNextMessage = false,
+    this.error,
   });
 
   @override
@@ -41,5 +43,6 @@ class ChatState extends Equatable {
         user,
         message,
         hasNextMessage,
+        error,
       ];
 }
