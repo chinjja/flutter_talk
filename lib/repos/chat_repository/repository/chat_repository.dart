@@ -111,12 +111,16 @@ class ChatRepository {
     await _chatProvider.read(chat: chat);
   }
 
-  Future<List<Chat>> getChats({required ChatType type}) async {
+  Future<List<Chat>> _getChats({required ChatType type}) async {
     return await _chatProvider.getChats(type: type);
   }
 
+  Future<Chat?> getDirectChat(User user) async {
+    return await _chatProvider.getDirectChat(user);
+  }
+
   Future<List<ChatItem>> getJoinedChats() async {
-    final chats = await getChats(type: ChatType.join);
+    final chats = await _getChats(type: ChatType.join);
     final list = await Stream.fromIterable(chats)
         .asyncMap((event) => _bindChat(event))
         .toList();

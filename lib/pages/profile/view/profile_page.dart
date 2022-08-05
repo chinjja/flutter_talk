@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:formz/formz.dart';
 import 'package:go_router/go_router.dart';
 import 'package:talk/common/common.dart';
 import 'package:talk/repos/repos.dart';
@@ -22,15 +23,37 @@ class ProfilePage extends StatelessWidget {
       create: (context) => ProfileBloc(
         user: user,
         userRepository: context.read<UserRepository>(),
+        chatRepository: context.read<ChatRepository>(),
         listenRepository: context.read<ListenRepository>(),
       )..add(ProfileStarted(username)),
-      child: BlocListener<ProfileBloc, ProfileState>(
-        listenWhen: (previous, current) => previous.status != current.status,
-        listener: (context, state) {
-          if (state.status == FetchStatus.failure) {
-            showError(context, state.error);
-          }
-        },
+      child: MultiBlocListener(
+        listeners: [
+          BlocListener<ProfileBloc, ProfileState>(
+            listenWhen: (previous, current) =>
+                previous.status != current.status,
+            listener: (context, state) {
+              if (state.status == FetchStatus.failure) {
+                showError(context, state.error);
+              }
+            },
+          ),
+          BlocListener<ProfileBloc, ProfileState>(
+            listenWhen: (previous, current) =>
+                previous.directChatStatus != current.directChatStatus,
+            listener: (context, state) {
+              if (state.directChatStatus.isSubmissionSuccess) {
+                context.goNamed(
+                  'chats',
+                  params: {
+                    'tab': 'chat',
+                    'chatId': '${state.directChat!.id}',
+                  },
+                  extra: state.directChat,
+                );
+              }
+            },
+          ),
+        ],
         child: const ProfileView(),
       ),
     );
@@ -58,18 +81,21 @@ class ProfileView extends StatelessWidget {
             ],
           ),
           body: SafeArea(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: const [
-                _ProfilePhoto(),
-                _NameText(),
-                SizedBox(height: 8),
-                _StateText(),
-                SizedBox(height: 8),
-                Divider(),
-                SizedBox(height: 8),
-                _BottomActions(),
-              ],
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: const [
+                  _ProfilePhoto(),
+                  _NameText(),
+                  SizedBox(height: 8),
+                  _StateText(),
+                  SizedBox(height: 8),
+                  Divider(),
+                  SizedBox(height: 8),
+                  _BottomActions(),
+                ],
+              ),
             ),
           ),
         );
@@ -130,24 +156,29 @@ class _BottomActions extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ProfileBloc, ProfileState>(
       builder: (context, state) {
-        final isAuth = context.isAuth(state.user);
+        final user = state.user;
+        final isAuth = context.isAuth(user);
         return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          _tap(Icons.sms, '1:1 채팅'),
+          if (!isAuth)
+            _tap(user, Icons.sms, '1:1 채팅', () {
+              context.read<ProfileBloc>().add(const ProfileDirectChatClicked());
+            }),
           if (isAuth)
-            _tap(Icons.edit, '프로필 편집', () {
+            _tap(user, Icons.edit, '프로필 편집', () {
               context.pushNamed('profile-edit', extra: state.user!);
             }),
-          if (!isAuth) _tap(Icons.call, '통화하기'),
+          if (!isAuth) _tap(user, Icons.call, '통화하기'),
         ]);
       },
     );
   }
 
-  Widget _tap(IconData icon, String label, [VoidCallback? onPressed]) {
+  Widget _tap(User? user, IconData icon, String label,
+      [VoidCallback? onPressed]) {
     return TextButton.icon(
       icon: Icon(icon),
       label: Text(label),
-      onPressed: onPressed,
+      onPressed: user == null ? null : onPressed,
     );
   }
 }

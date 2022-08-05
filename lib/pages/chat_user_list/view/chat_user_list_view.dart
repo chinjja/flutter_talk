@@ -94,7 +94,10 @@ class _MemberList extends StatelessWidget {
             delegate: SliverChildBuilderDelegate(
               (context, index) {
                 if (index == 0) {
-                  return const _AddMemberTile();
+                  if (state.chat?.joinable ?? false) {
+                    return const _AddMemberTile();
+                  }
+                  return const SizedBox();
                 }
                 final item = state.users[index - 1];
                 return UserTile(

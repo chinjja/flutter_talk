@@ -56,6 +56,25 @@ void main() {
       });
     });
 
+    group('getDirectChat()', () {
+      test('when is exists then returns a chat', () async {
+        final user = User(username: 'user');
+
+        final chat = Chat(id: 1, createdAt: DateTime.now());
+        when(() => dio.get('/chats/direct/user')).thenAnswer(
+          (_) async => FakeResponse(
+            data: chat.toJson(),
+          ),
+        );
+
+        final res = await chatProvider.getDirectChat(user);
+        expect(res, chat);
+
+        verify(() => dio.get('/chats/direct/user')).called(1);
+        verifyNoMoreInteractions(dio);
+      });
+    });
+
     group('createOpenChat()', () {
       test('when title is passed then returns an id', () async {
         final data = {'title': 'a'};

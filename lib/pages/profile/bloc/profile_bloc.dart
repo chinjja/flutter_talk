@@ -14,6 +14,7 @@ part 'profile_bloc.g.dart';
 
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final UserRepository _userRepository;
+  final ChatRepository _chatRepository;
   final ListenRepository _listenRepository;
 
   Unsubscribe? _unsubscribe;
@@ -21,8 +22,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   ProfileBloc({
     User? user,
     required UserRepository userRepository,
+    required ChatRepository chatRepository,
     required ListenRepository listenRepository,
   })  : _userRepository = userRepository,
+        _chatRepository = chatRepository,
         _listenRepository = listenRepository,
         super(ProfileState(user: user)) {
     on<ProfileStarted>((event, emit) async {
@@ -52,6 +55,34 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         status: FetchStatus.success,
         user: user,
       ));
+    });
+
+    on<ProfileDirectChatClicked>((event, emit) async {
+      final user = state.user;
+      if (user == null) return;
+
+      try {
+        emit(state.copyWith.directChatStatus(FormzStatus.submissionInProgress));
+        final chat = await _chatRepository.getDirectChat(user);
+        if (chat != null) {
+          emit(state.copyWith(
+            directChatStatus: FormzStatus.submissionSuccess,
+            directChat: chat,
+          ));
+          return;
+        }
+
+        final chatId = await _chatRepository.createDirectChat(other: user);
+        emit(state.copyWith(
+          directChatStatus: FormzStatus.submissionSuccess,
+          directChat: await _chatRepository.getChat(chatId),
+        ));
+      } catch (e) {
+        emit(state.copyWith(
+          directChatStatus: FormzStatus.submissionFailure,
+          error: e,
+        ));
+      }
     });
   }
 

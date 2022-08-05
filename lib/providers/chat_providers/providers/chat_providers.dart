@@ -27,6 +27,18 @@ class ChatProvider {
     return Chat.fromJson(res.data);
   }
 
+  Future<Chat?> getDirectChat(User user) async {
+    try {
+      final res = await _dio.get('/chats/direct/${user.username}');
+      return Chat.fromJson(res.data);
+    } on DioError catch (e) {
+      if (e.response?.statusCode == 404) {
+        return null;
+      }
+      rethrow;
+    }
+  }
+
   Future<int> createOpenChat({
     required String title,
   }) async {
