@@ -68,6 +68,12 @@ class _EmailField extends StatelessWidget {
             labelText: 'Enter Email',
             errorText: state.email.invalid ? 'invalid email' : null,
           ),
+          keyboardType: TextInputType.emailAddress,
+          onSubmitted: (_) {
+            context
+                .read<ResetPasswordBloc>()
+                .add(const ResetPasswordSubmitted());
+          },
         );
       },
     );

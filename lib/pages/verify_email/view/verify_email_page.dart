@@ -101,6 +101,10 @@ class _VerificationCodeTextField extends StatelessWidget {
         hintText: 'Enter verification code',
         filled: true,
       ),
+      keyboardType: TextInputType.number,
+      onSubmitted: (_) {
+        context.read<VerifyEmailBloc>().add(const VerifyEmailSubmitted());
+      },
     );
   }
 }

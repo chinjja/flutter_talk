@@ -90,6 +90,8 @@ class _UsernameTextField extends StatelessWidget {
                 ? 'enter username formatted email'
                 : null,
           ),
+          keyboardType: TextInputType.emailAddress,
+          textInputAction: TextInputAction.next,
         );
       },
     );
@@ -113,6 +115,7 @@ class _PasswordTextField extends StatelessWidget {
             hintText: 'Password',
             errorText: state.password.invalid ? 'password invalid' : null,
           ),
+          textInputAction: TextInputAction.next,
         );
       },
     );
@@ -139,6 +142,8 @@ class _ConfirmPasswordTextField extends StatelessWidget {
             errorText:
                 state.confirmPassword.invalid ? 'password do not match' : null,
           ),
+          onSubmitted: (_) =>
+              context.read<RegisterBloc>().add(const RegisterSubmitted()),
         );
       },
     );

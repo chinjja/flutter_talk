@@ -140,6 +140,7 @@ class _NameField extends StatelessWidget {
           onChanged: (value) {
             context.read<ProfileEditBloc>().add(ProfileEditNameChanged(value));
           },
+          textInputAction: TextInputAction.next,
         );
       },
     );

@@ -36,7 +36,7 @@ class LoginView extends StatelessWidget {
         },
         child: Container(
           alignment: Alignment.center,
-          padding: const EdgeInsets.all(32),
+          padding: const EdgeInsets.symmetric(horizontal: 32),
           child: SizedBox(
             width: 400,
             child: Column(
@@ -77,6 +77,8 @@ class _UsernameTextField extends StatelessWidget {
                 ? 'enter username formatted email'
                 : null,
           ),
+          keyboardType: TextInputType.emailAddress,
+          textInputAction: TextInputAction.next,
         );
       },
     );
@@ -99,6 +101,8 @@ class _PasswordTextField extends StatelessWidget {
             hintText: 'Password',
             errorText: state.password.invalid ? 'invalid password' : null,
           ),
+          onSubmitted: (_) =>
+              context.read<LoginBloc>().add(const LoginSubmitted()),
         );
       },
     );
