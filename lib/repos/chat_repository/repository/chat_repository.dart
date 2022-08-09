@@ -85,12 +85,17 @@ class ChatRepository {
           return e.copyWith(
             info: e.info.copyWith(
               userCount: e.info.userCount + 1,
+              users: [...e.info.users, event.chatUser.user],
             ),
           );
         } else if (event.isRemoved) {
           return e.copyWith(
             info: e.info.copyWith(
               userCount: e.info.userCount - 1,
+              users: [
+                ...e.info.users
+                    .where((e) => e.username == event.chatUser.user.username)
+              ],
             ),
           );
         } else if (event.isUpdated) {

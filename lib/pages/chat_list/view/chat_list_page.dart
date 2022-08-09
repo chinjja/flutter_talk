@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:talk/common/common.dart';
 import 'package:talk/repos/repos.dart';
 
 import '../chat_list.dart';
@@ -97,7 +98,7 @@ class _ChatTile extends StatelessWidget {
       ),
       child: ListTile(
         visualDensity: VisualDensity.standard,
-        leading: const CircleAvatar(child: Icon(Icons.chat)),
+        leading: _Icon(item: chatItem),
         title: _Title(item: chatItem),
         subtitle: _Message(message: chatItem.info.latestMessage?.message),
         trailing: Column(
@@ -113,6 +114,44 @@ class _ChatTile extends StatelessWidget {
         },
       ),
     );
+  }
+}
+
+class _Icon extends StatelessWidget {
+  final ChatItem item;
+  const _Icon({Key? key, required this.item}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final auth = context.auth;
+    switch (item.chat.type) {
+      case 'direct':
+        return item.info.users
+            .where((e) => e.username != auth?.username)
+            .map((e) => UserAvatar(e))
+            .first;
+      case 'open':
+      case 'group':
+        List<User?> users = [
+          ...item.info.users.where((e) => e.username != auth?.username).take(4)
+        ];
+        while (users.length < 4) {
+          users.add(null);
+        }
+        return SizedBox(
+          width: 40,
+          child: Wrap(
+            children: users
+                .map((e) => Padding(
+                      padding: const EdgeInsets.all(1),
+                      child:
+                          SizedBox(width: 18, height: 18, child: UserAvatar(e)),
+                    ))
+                .toList(),
+          ),
+        );
+    }
+    return const SizedBox();
   }
 }
 
@@ -132,11 +171,29 @@ class _Title extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final chat = item.chat;
+    final auth = context.auth;
+    String title = '제목없는 채팅';
+    switch (item.chat.type) {
+      case 'direct':
+        title = item.info.users
+            .where((e) => e.username != auth?.username)
+            .map((e) => e.name ?? e.username)
+            .first;
+        break;
+      case 'open':
+      case 'group':
+        title = item.chat.title ??
+            item.info.users
+                .where((e) => e.username != auth?.username)
+                .take(4)
+                .fold('', (a, user) => a + (user.name ?? user.username));
+        break;
+    }
+
     return Row(
       children: [
         Text(
-          chat.title ?? '제목없는 채팅',
+          title,
           maxLines: 1,
         ),
         const SizedBox(width: 4),

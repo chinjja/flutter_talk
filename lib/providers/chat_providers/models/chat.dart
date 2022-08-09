@@ -14,6 +14,7 @@ class Chat extends Equatable {
   final bool visible;
   final bool joinable;
 
+  final String type;
   final String? title;
   final String? description;
 
@@ -24,6 +25,7 @@ class Chat extends Equatable {
   const Chat({
     required this.id,
     required this.createdAt,
+    this.type = '',
     this.visible = false,
     this.joinable = false,
     this.title,
@@ -39,6 +41,7 @@ class Chat extends Equatable {
   List<Object?> get props => [
         id,
         createdAt,
+        type,
         visible,
         joinable,
         title,

@@ -12,11 +12,13 @@ class ChatInfo extends Equatable {
   final int unreadCount;
   final int userCount;
   final ChatMessage? latestMessage;
+  final List<User> users;
 
   const ChatInfo({
-    required this.unreadCount,
-    required this.userCount,
-    required this.latestMessage,
+    this.unreadCount = 0,
+    this.userCount = 0,
+    this.latestMessage,
+    this.users = const [],
   });
 
   factory ChatInfo.fromJson(Map<String, dynamic> json) =>
@@ -24,5 +26,5 @@ class ChatInfo extends Equatable {
 
   Map<String, dynamic> toJson() => _$ChatInfoToJson(this);
   @override
-  List<Object?> get props => [unreadCount, userCount, latestMessage];
+  List<Object?> get props => [unreadCount, userCount, latestMessage, users];
 }

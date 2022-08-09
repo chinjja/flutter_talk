@@ -9,9 +9,19 @@ class UserAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (user == null) {
+      return const CircleAvatar(
+        backgroundColor: Colors.grey,
+      );
+    }
     final photoId = user?.photoId;
+    if (photoId == null) {
+      return const CircleAvatar(
+        child: Icon(Icons.person),
+      );
+    }
     return CircleAvatar(
-      backgroundImage: photoId == null ? null : StorageImage(photoId).provider,
+      backgroundImage: StorageImage(photoId).provider,
     );
   }
 }
